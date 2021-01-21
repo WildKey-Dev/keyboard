@@ -30,6 +30,6 @@ Demo [apk]()
   - Add an android app
     - Fill the package and SHA1 fields
   - Download the ```google-services.json``` file
-  - With the content of ```google-services.json``` fill the info on the ```values.xml``` inside ```/<aosp-root>/packages/inputmethods/LatinIME/java/res/values/``` 
+  - With the content of ```google-services.json``` fill this [example](https://www.notion.so/values-xml-eef5a253e5934a0e9c1848b5756a255d) and create a ```values.xml``` with it inside ```/<aosp-root>/packages/inputmethods/LatinIME/java/res/values/``` 
   - Set the appropriated rules for read and write of the real time data base [(example)](https://www.notion.so/Rules-8cf11adaa63844a6af802a17ad083fd7)
   - An [example](https://www.notion.so/Database-strucutre-4a51b19b3bf843bc9ed6a01285417c0a) on how to structure the DB
