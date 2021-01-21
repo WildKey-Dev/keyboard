@@ -1,5 +1,5 @@
 # ideafast-keyboard
-Demo [apk]()
+Demo [apk](https://drive.google.com/file/d/1-Kc-QFskSjKkx0u_EFXAwMzgJk0d1H5W/view?usp=sharing)
 
 ## how to compile
 
