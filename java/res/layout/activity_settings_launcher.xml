@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="20"
+    tools:context=".settings.SettingsLauncherActivity">
+
+    <Button
+        android:id="@+id/bt_start_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:layout_weight="1"
+        android:background="@drawable/bt_bg_selector"
+        android:text="@string/settings"
+        android:textColor="@drawable/bt_text_selector"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/bt_start_demo_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:layout_weight="1"
+        android:background="@drawable/bt_bg_selector"
+        android:textColor="@drawable/bt_text_selector"
+        android:text="@string/start_demo_activity"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/bt_start_prompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:layout_weight="1"
+        android:background="@drawable/bt_bg_selector_inverted"
+        android:textColor="@drawable/bt_text_selector_inverted"
+        android:text="@string/start_prompt"
+        android:textSize="16sp" />
+</LinearLayout>

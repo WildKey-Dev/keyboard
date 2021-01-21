@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_focused="true"
+        android:state_pressed="true"
+        android:drawable="@drawable/bt_start_bg_clicked"
+        android:color="@color/white"
+        />
+
+    <item
+        android:state_focused="false"
+        android:state_pressed="true"
+        android:drawable="@drawable/bt_start_bg_clicked"
+        android:color="@color/white"
+        />
+
+    <item android:drawable="@drawable/bt_start_bg_normal"
+        android:color="@color/study_accent_color"/>
+</selector>

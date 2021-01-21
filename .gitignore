@@ -1,0 +1,11 @@
+# Gradle
+.externalNativeBuild/
+.gradle/
+.idea/
+LatinIME.iml
+build/
+local.properties
+java/google-services.json
+google-services.json
+*.hprof
+/java/res/values/values.xml

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_task"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:textAlignment="viewStart"
+        android:textDirection="ltr"
+        android:textSize="12pt" />
+
+    <Button
+        android:id="@+id/bt_start"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/bt_start_bg_selector"
+        android:textColor="@drawable/bt_text_selector"
+        android:gravity="center|center_horizontal|center_vertical"
+        android:text="@string/start" />
+</RelativeLayout>
