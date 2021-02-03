@@ -52,7 +52,7 @@ public class Logger {
     private final ArrayList<Long> inputTimeStamps = new ArrayList<>();
     //    private ArrayList<String> spellChecker = new ArrayList<>();
     private final ArrayList<SuggestedWords> suggestions = new ArrayList<>();
-    private final HashMap<String, SuggestedWords> suggestedWordsHashMap = new HashMap<>();
+    private final HashMap<String, ArrayList<Tuple>> mSuggestedWordsHashMap = new HashMap<>();
     private long downTS, wordStartTS, wordFinishTS, outPhraseTS = -1;
     private float tMajor = -1, tMinor = -1;
     private boolean isEventRunning = false, lastInputWasDelete = false, lastInputWasSpace = false,
@@ -62,6 +62,7 @@ public class Logger {
     private boolean isCursorOnEnd = true, ignoreInput = false, wasEditTextEmpty;
     private int numbers = 0, specialChars = 0, suggestionsSelected = 0, autoCorrection = 0, voiceInput = 0, cursorMoves = 0, compositionStartIndex = 0;
     private final ArrayList<CursorChange> cursorChanges = new ArrayList<>();
+    private SuggestedWords currentSuggestionList;
 
     public Logger() {}
 
@@ -356,13 +357,19 @@ public class Logger {
         StringBuilder sb = new StringBuilder();
 
         for (String s: transcribe.split(" ")){
-            if(suggestedWordsHashMap.containsKey(s)) {
-                if(suggestedWordsHashMap.get(s).mTypedWordValid){
-                    sb.append(suggestedWordsHashMap.get(s).mTypedWordInfo.mWord);
+            if(mSuggestedWordsHashMap.containsKey(s)){
+                SuggestedWords list = getClosestSuggestion(sb.toString().length(), mSuggestedWordsHashMap.get(s));
+                if(list.mTypedWordValid){
+                    sb.append(list.mTypedWordInfo.mWord);
                 }else {
-                    if(suggestedWordsHashMap.get(s).mSuggestedWordInfoList.size() > 1) {
-
-                        sb.append(suggestedWordsHashMap.get(s).mSuggestedWordInfoList.get(1).mWord);
+                    if(list.mSuggestedWordInfoList.size() > 1) {
+                        sb.append(list.mSuggestedWordInfoList.get(1).mWord);
+                    }else{
+                        if(list.mSuggestedWordInfoList.size() > 0) {
+                            sb.append(list.mSuggestedWordInfoList.get(0).mWord);
+                        }else {
+                            sb.append(s);
+                        }
                     }
                 }
             }else {
@@ -371,6 +378,19 @@ public class Logger {
             sb.append(" ");
         }
         return sb.toString().trim();
+    }
+
+    private SuggestedWords getClosestSuggestion(int length, ArrayList<Tuple> tuples) {
+        int distance = Integer.MAX_VALUE;
+        SuggestedWords list = null;
+        for (Tuple t: tuples){
+            if(Math.abs((int) t.t1 - length) < distance){
+                distance = Math.abs((int) t.t1 - length);
+                list = (SuggestedWords) t.t2;
+            }
+        }
+
+        return list;
     }
 
 
@@ -455,8 +475,7 @@ public class Logger {
         if(!LoggerController.getInstance().shouldILog() || ignoreInput)
             return;
 
-        if(!list.isEmpty())
-            suggestedWordsHashMap.put(list.mSuggestedWordInfoList.get(0).mWord, list);
+        currentSuggestionList = list;
 
         willAutoCorrect = list.mWillAutoCorrect;
         suggestions.add(list);
@@ -548,7 +567,6 @@ public class Logger {
             if(!wordTranscribe.isEmpty())
                 wordTranscribe = wordTranscribe.substring(0, wordTranscribe.length()-1);
 
-            //DO THE MAGIC
             if(autoCorrected){
                 removeLastSuggestionFromInput();
             }
@@ -568,6 +586,13 @@ public class Logger {
                     setAutoCorrected(true);
                 }else
                     setAutoCorrected(false);
+
+                if(currentSuggestionList != null && currentSuggestionList.mSuggestedWordInfoList.size() > 0){
+                    if (!mSuggestedWordsHashMap.containsKey(currentSuggestionList.mSuggestedWordInfoList.get(0).mWord))
+                        mSuggestedWordsHashMap.put(currentSuggestionList.mSuggestedWordInfoList.get(0).mWord, new ArrayList<>());
+                    mSuggestedWordsHashMap.get(currentSuggestionList.mSuggestedWordInfoList.get(0).mWord).add(new Tuple(getTranscribe().length(), currentSuggestionList));
+                }
+
 
                 addToInputBuffer(" ");
 //                inputBuffer = inputBuffer + " ";
