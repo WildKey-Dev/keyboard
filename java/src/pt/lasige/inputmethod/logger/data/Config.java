@@ -149,7 +149,7 @@ public class Config {
     }
 
     private Date parseDate(String date){
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm'Z'");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         try {
             return format.parse(date);
         } catch (Exception e) {
