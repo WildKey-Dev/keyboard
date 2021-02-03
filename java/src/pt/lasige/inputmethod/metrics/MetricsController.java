@@ -161,10 +161,6 @@ public class MetricsController {
                 }
             }else if(mode == StudyConstants.COMPOSITION_MODE){
                 DataBaseFacade.getInstance().write("target_phrase", trial.getTrial().getRequiredSentence(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                if (LoggerController.getInstance().isLogTouch()){
-                    DataBaseFacade.getInstance().write("motion", log.getMotion(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                    DataBaseFacade.getInstance().write("keys", log.getKeys(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                }
             }
         }catch (Exception e){
             e.printStackTrace();
