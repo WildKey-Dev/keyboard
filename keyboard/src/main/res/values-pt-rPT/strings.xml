@@ -243,16 +243,25 @@
     <string name="start_prompt">Lista de tarefas</string>
     <string name="start_prompt_desc">Ver lista de tarefas a realizar</string>
     <string name="the_list_is_empty">Não existem tarefas novas</string>
-    <string name="start_next_task">Iniciar próxima tarefa</string>
+    <string name="start_next_task">Iniciar tarefa</string>
     <string name="quest_selected">Selecionado:</string>
     <string name="settings">Definições</string>
     <string name="sent_with_success">Guardado com sucesso ✔</string>
     <string name="please_wait">Por favor aguarde</string>
     <string name="loading_next_question">A carregar a próxima questão</string>
-    <string name="next">Seguinte</string>
+    <string name="next">Próxima</string>
     <string name="loading_taks">A carregar tarefa</string>
     <string name="is_taking_to_long">O carregamento da tarefa está demorar mais do que o normal. Por favor verifique a sua ligação à internet e tente novamente.</string>
     <string name="you_have_until">Tem até às </string>
     <string name="to_finish"> para acabar a tarefa.</string>
     <string name="next_task">Próxima tarefa: %1$s</string>
+    <string name="close">Fechar</string>
+    <string name="thank_you">Obrigado por completar a tarefa</string>
+    <string name="done">Concluído!</string>
+    <string name="leave">Sair?</string>
+    <string name="leave_message">Se sair agora, perderá todas as suas respostas.</string>
+    <string name="leave_neutral_button">Voltar à tarefa</string>
+    <string name="leave_negative_button">Sair da tarefa</string>
+    <string name="pending_task">%1$s tarefa pendente</string>
+    <string name="pending_tasks">%1$s tarefas pendentes</string>
 </resources>

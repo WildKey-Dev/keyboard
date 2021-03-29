@@ -125,12 +125,11 @@ public class DataBaseFacade {
         write("time", timeSpent,  "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
     }
 
-    public void setQuestionnaireScaleResponse(int scale, String text, String studyID, String questionID, String questionnaireID, long timeSpent) {
+    public void setQuestionnaireScaleResponse(int scale, String studyID, String questionID, String questionnaireID, long timeSpent) {
         if (isDemo())
             return;
 
         write("scale", scale, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/response/");
-        write("desc", text,  "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/response/");
         write("time", timeSpent, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/response/");
     }
 

@@ -59,16 +59,10 @@
 
         <activity android:name="pt.lasige.inputmethod.study.TranscriptionActivity" android:windowSoftInputMode="adjustResize"/>
         <activity android:name="pt.lasige.inputmethod.study.CompositionActivity" android:windowSoftInputMode="adjustResize"/>
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireLauncherActivity"/>
         <activity android:name="pt.lasige.inputmethod.study.AlternateFingerTappingActivity" />
         <activity android:name="pt.lasige.inputmethod.study.DemoActivity"/>
         <activity android:name="pt.lasige.inputmethod.study.PromptLauncherActivity"/>
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireCheckboxActivity" />
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireHourActivity" />
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireRadioActivity" />
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireScaleActivity" />
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireScaleRadioBtActivity" />
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireTextActivity" />
+        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireLauncherActivity" android:theme="@style/MyQuestionnaire"/>
         <activity android:name="pt.lasige.inputmethod.latin.settings.SettingsLauncherActivity" />
 
         <receiver

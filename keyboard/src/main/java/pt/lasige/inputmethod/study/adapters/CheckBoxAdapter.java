@@ -39,7 +39,7 @@ public class CheckBoxAdapter extends ArrayAdapter<String> implements CompoundBut
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new AppInfoHolder();
-            holder.chkSelect = (CheckBox) row.findViewById(R.id.checkBox);
+//            holder.chkSelect = (CheckBox) row.findViewById(R.id.checkBox);
             row.setTag(holder);
 
         }

@@ -1,14 +1,9 @@
 package pt.lasige.inputmethod.study.scheduler;
 
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,8 +13,7 @@ import pt.lasige.inputmethod.logger.DataBaseFacade;
 import pt.lasige.inputmethod.logger.data.Config;
 import pt.lasige.inputmethod.logger.data.Prompt;
 import pt.lasige.inputmethod.logger.data.TimeFrame;
-import pt.lasige.inputmethod.study.adapters.PromptAdapter;
-import pt.lasige.inputmethod.study.scheduler.notification.AlarmReceiver;
+import pt.lasige.inputmethod.study.adapters.PromptLauncherUIController;
 
 public class ScheduleController {
     private static ScheduleController instance;
@@ -31,7 +25,7 @@ public class ScheduleController {
     HashMap<String, Prompt> singlePrompts = new HashMap<>();
     HashMap<String, Prompt> questions = new HashMap<>();
     HashMap<String, TimeFrame> timeFrames = new HashMap<>();
-    PromptAdapter adapter;
+    PromptLauncherUIController promptUiController;
     //for demo only
     ArrayList<String> questionList = new ArrayList<>();
     int questionListIndex = 0;
@@ -120,8 +114,8 @@ public class ScheduleController {
     public void setQueue(ArrayList<String> queue) {
         this.queue = queue;
 
-        if(adapter != null)
-            adapter.setData(getQueue());
+        if(promptUiController != null)
+            promptUiController.setData(getQueue());
     }
 
     public Prompt getPrompt(String promptID){
@@ -152,8 +146,8 @@ public class ScheduleController {
             queue.add(p.getTimeFrame().getTimeFrameID() + "_" + p.getPromptId());
             singlePrompts.put(p.getTimeFrame().getTimeFrameID() + "_" + p.getPromptId(), p);
         }
-        if(adapter != null)
-            adapter.setData(getQueue());
+        if(promptUiController != null)
+            promptUiController.setData(getQueue());
 
         prompts.put(p.getPromptId(), p);
 
@@ -187,8 +181,8 @@ public class ScheduleController {
             queue.add(p.getTimeFrame().getTimeFrameID() + "_" + p.getPromptId());
             singlePrompts.put(p.getTimeFrame().getTimeFrameID() + "_" + p.getPromptId(), p);
         }
-        if(adapter != null)
-            adapter.setData(getQueue());
+        if(promptUiController != null)
+            promptUiController.setData(getQueue());
 
     }
 
@@ -225,17 +219,17 @@ public class ScheduleController {
         queue.remove(questionID);
         singlePrompts.remove(questionID);
 
-        if(adapter != null)
-            adapter.setData(getQueue());
+        if(promptUiController != null)
+            promptUiController.setData(getQueue());
 
     }
 
-    public PromptAdapter getAdapter() {
-        return adapter;
+    public PromptLauncherUIController getPromptUiController() {
+        return promptUiController;
     }
 
-    public void setAdapter(PromptAdapter adapter) {
-        this.adapter = adapter;
+    public void setPromptUiController(PromptLauncherUIController promptUiController) {
+        this.promptUiController = promptUiController;
     }
 
     public Prompt getAtomicPrompt(String id){

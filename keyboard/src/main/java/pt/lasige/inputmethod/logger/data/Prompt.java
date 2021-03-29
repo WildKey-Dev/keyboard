@@ -11,6 +11,7 @@ public class Prompt {
     String question;
     String higherBound;
     String lowerBound;
+    String orientation;
     ArrayList<String> questions;
     ArrayList<String> phrases;
     ArrayList<String> scaleSteps;
@@ -126,6 +127,14 @@ public class Prompt {
 
     public void setTimeFrame(TimeFrame tf) {
         this.tf = tf;
+    }
+
+    public String getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(String orientation) {
+        this.orientation = orientation;
     }
 
     @Override
