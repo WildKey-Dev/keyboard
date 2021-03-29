@@ -42,10 +42,10 @@
         android:fragment="pt.lasige.inputmethod.latin.settings.AdvancedSettingsFragment"
         android:title="@string/settings_screen_advanced"
         android:key="screen_advanced" />
-    <PreferenceScreen
-        android:fragment="pt.lasige.inputmethod.latin.settings.StudySettings"
-        android:title="@string/settings_screen_study"
-        android:key="screen_study" />
+<!--    <PreferenceScreen-->
+<!--        android:fragment="pt.lasige.inputmethod.latin.settings.StudySettings"-->
+<!--        android:title="@string/settings_screen_study"-->
+<!--        android:key="screen_study" />-->
 
 
 </PreferenceScreen>
