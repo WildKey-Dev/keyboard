@@ -331,6 +331,14 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
     @Override
     public void onClick(final View v) {
         if (v == mActionFinish) {
+
+            final Intent intent = new Intent();
+            intent.setClass(getApplicationContext(), SettingsActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+                    | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra(SettingsActivity.EXTRA_ENTRY_KEY,
+                    SettingsActivity.EXTRA_ENTRY_VALUE_APP_ICON);
+            startActivity(intent);
             finish();
             return;
         }
