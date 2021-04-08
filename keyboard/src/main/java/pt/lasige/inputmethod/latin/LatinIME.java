@@ -71,6 +71,7 @@ import pt.lasige.inputmethod.keyboard.Keyboard;
 import pt.lasige.inputmethod.keyboard.KeyboardActionListener;
 import pt.lasige.inputmethod.keyboard.KeyboardId;
 import pt.lasige.inputmethod.keyboard.KeyboardSwitcher;
+import pt.lasige.inputmethod.keyboard.KeyboardTheme;
 import pt.lasige.inputmethod.keyboard.MainKeyboardView;
 import pt.lasige.inputmethod.latin.Suggest.OnGetSuggestedWordsCallback;
 import pt.lasige.inputmethod.latin.SuggestedWords.SuggestedWordInfo;
@@ -499,6 +500,9 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
         }
 
         public void onStartInputView(final EditorInfo editorInfo, final boolean restarting) {
+
+            LoggerController.getInstance().setLog(getOwnerInstance().getApplicationContext(), true);
+
             if (hasMessages(MSG_PENDING_IMS_CALLBACK)
                     && KeyboardId.equivalentEditorInfoForKeyboard(editorInfo, mAppliedEditorInfo)) {
                 // Typically this is the second onStartInputView after orientation changed.
