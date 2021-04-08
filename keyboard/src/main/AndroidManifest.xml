@@ -57,8 +57,8 @@
         android:directBootAware="true">
 
 
-        <activity android:name="pt.lasige.inputmethod.study.TranscriptionActivity" android:windowSoftInputMode="adjustResize"/>
-        <activity android:name="pt.lasige.inputmethod.study.CompositionActivity" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name="pt.lasige.inputmethod.study.TranscriptionActivity"/>
+        <activity android:name="pt.lasige.inputmethod.study.CompositionActivity"/>
         <activity android:name="pt.lasige.inputmethod.study.AlternateFingerTappingActivity" />
         <activity android:name="pt.lasige.inputmethod.study.DemoActivity"/>
         <activity android:name="pt.lasige.inputmethod.study.PromptLauncherActivity"/>

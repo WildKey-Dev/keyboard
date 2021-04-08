@@ -7,6 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import pt.lasige.inputmethod.latin.RichInputMethodManager;
 import pt.lasige.inputmethod.logger.DataBaseFacade;
 import pt.lasige.inputmethod.logger.Logger;
 import pt.lasige.inputmethod.logger.LoggerController;
@@ -74,6 +75,7 @@ public class MetricsController {
         TextEntryTrialController trial = null;
 
         try {
+
             //fresh trial
             trial = configTrial(log, targetPhrase, removeSuggestionsFromInputStream);
 
@@ -147,7 +149,33 @@ public class MetricsController {
             DataBaseFacade.getInstance().write("input-timestamps", log.getInputTimeStamps(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             DataBaseFacade.getInstance().write("time-outside-phrase", top, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
 
-            //maybe we could remove this if
+            //Language
+            DataBaseFacade.getInstance().write(
+                    "country",
+                    String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().getDisplayCountry()),
+                    "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
+            DataBaseFacade.getInstance().write(
+                    "language",
+                    String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().getDisplayLanguage()),
+                    "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
+            DataBaseFacade.getInstance().write(
+                    "name",
+                    String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().getDisplayName()),
+                    "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
+            DataBaseFacade.getInstance().write(
+                    "iso_country",
+                    String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().getISO3Country()),
+                    "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
+            DataBaseFacade.getInstance().write(
+                    "iso_language",
+                    String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().getISO3Language()),
+                    "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
+            DataBaseFacade.getInstance().write(
+                    "tag",
+                    String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().toLanguageTag()),
+                    "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
+
+
             if(mode == StudyConstants.IMPLICIT_MODE){
             }else if(mode == StudyConstants.TRANSCRIPTION_MODE){
                 DataBaseFacade.getInstance().write("input-stream-og", log.getOriginalInputBuffer(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
