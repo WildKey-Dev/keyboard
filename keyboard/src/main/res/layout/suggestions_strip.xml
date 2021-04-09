@@ -61,6 +61,15 @@
             android:textSize="16sp"
             style="?attr/suggestionWordStyle" />
     </LinearLayout>
+    <TextView
+        android:id="@+id/suggestions_strip_number_of_tasks_to_do"
+        android:layout_width="@dimen/config_suggestions_strip_edge_key_width"
+        android:layout_height="fill_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:textSize="20sp"
+        style="?attr/suggestionWordStyle"/>
     <ImageButton
         android:id="@+id/suggestions_strip_voice_key"
         android:layout_width="@dimen/config_suggestions_strip_edge_key_width"

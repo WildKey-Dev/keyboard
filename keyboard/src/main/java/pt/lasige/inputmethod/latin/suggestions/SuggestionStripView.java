@@ -17,6 +17,7 @@
 package pt.lasige.inputmethod.latin.suggestions;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -58,6 +59,8 @@ import pt.lasige.inputmethod.latin.utils.ImportantNoticeUtils;
 import pt.lasige.inputmethod.logger.LoggerController;
 import pt.lasige.inputmethod.logger.data.StudyConstants;
 import pt.lasige.inputmethod.metrics.MetricsController;
+import pt.lasige.inputmethod.study.PromptLauncherActivity;
+import pt.lasige.inputmethod.study.scheduler.ScheduleController;
 
 import java.util.ArrayList;
 
@@ -74,6 +77,7 @@ public final class SuggestionStripView extends RelativeLayout implements OnClick
 
     private final ViewGroup mSuggestionsStrip;
     private final ImageButton mVoiceKey, mKillSwitch;
+    private final TextView tasksTODO;
     private final View mImportantNoticeStrip;
     MainKeyboardView mMainKeyboardView;
 
@@ -147,9 +151,18 @@ public final class SuggestionStripView extends RelativeLayout implements OnClick
         mSuggestionsStrip = (ViewGroup)findViewById(R.id.suggestions_strip);
         mVoiceKey = (ImageButton)findViewById(R.id.suggestions_strip_voice_key);
         mKillSwitch = (ImageButton)findViewById(R.id.suggestions_strip_log_kill_switch);
+        tasksTODO = (TextView)findViewById(R.id.suggestions_strip_number_of_tasks_to_do);
         mImportantNoticeStrip = findViewById(R.id.important_notice_strip);
         mStripVisibilityGroup = new StripVisibilityGroup(this, mSuggestionsStrip,
                 mImportantNoticeStrip);
+
+        ArrayList<String> data = ScheduleController.getInstance().getQueue();
+        if(data.isEmpty()) {
+            tasksTODO.setVisibility(GONE);
+        }else {
+            tasksTODO.setVisibility(VISIBLE);
+            tasksTODO.setText(String.valueOf(data.size()));
+        }
 
         for (int pos = 0; pos < SuggestedWords.MAX_SUGGESTIONS; pos++) {
             final TextView word = new TextView(context, null, R.attr.suggestionWordStyle);
@@ -187,6 +200,7 @@ public final class SuggestionStripView extends RelativeLayout implements OnClick
         mVoiceKey.setOnClickListener(this);
 
         mKillSwitch.setOnClickListener(this);
+        tasksTODO.setOnClickListener(this);
         updateLogButtonVisibility();
     }
 
@@ -203,7 +217,8 @@ public final class SuggestionStripView extends RelativeLayout implements OnClick
         final int visibility = shouldBeVisible ? VISIBLE : (isFullscreenMode ? GONE : INVISIBLE);
         setVisibility(visibility);
         final SettingsValues currentSettingsValues = Settings.getInstance().getCurrent();
-        mVoiceKey.setVisibility(currentSettingsValues.mShowsVoiceInputKey ? VISIBLE : INVISIBLE);
+        mVoiceKey.setVisibility(GONE);
+//        mVoiceKey.setVisibility(currentSettingsValues.mShowsVoiceInputKey ? VISIBLE : INVISIBLE);
         updateLogButtonVisibility();
     }
 
@@ -516,6 +531,12 @@ public final class SuggestionStripView extends RelativeLayout implements OnClick
 
                 Toast.makeText(getContext(), R.string.private_mode_activated, Toast.LENGTH_SHORT).show();
             }
+        }
+
+        if(view == tasksTODO){
+            final Intent intent = new Intent(getContext(), PromptLauncherActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            getContext().startActivity(intent);
         }
 
         final Object tag = view.getTag();
