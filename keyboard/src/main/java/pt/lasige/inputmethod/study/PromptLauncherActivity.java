@@ -24,12 +24,14 @@ public class PromptLauncherActivity extends Activity {
         DataBaseFacade.getInstance().setDemo(false);
 
         controller = new PromptLauncherUIController(this, ScheduleController.getInstance().getQueue(), findViewById(R.id.tv_title), findViewById(R.id.tv_message), findViewById(R.id.bt_next));
+        ScheduleController.getInstance().setPromptUiController(controller);
 
         findViewById(R.id.bt_next).setOnClickListener(view -> {
             if (!ScheduleController.getInstance().getConfig().getStudyId().equals("noConfigId") && ScheduleController.getInstance().getConfig().isValid()){
                 if(!controller.getData().isEmpty()){
                     Intent intent = PromptIntentFactory.getIntentForPrompt(getApplicationContext(), ScheduleController.getInstance().getPrompt(controller.getData().get(0)), controller.getData().get(0));
                     startActivity(intent);
+                    finish();
                 }else {
                     finish();
                 }

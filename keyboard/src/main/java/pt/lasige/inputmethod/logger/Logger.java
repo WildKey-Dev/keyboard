@@ -201,8 +201,19 @@ public class Logger {
     public void setWasEditTextEmpty(boolean wasEditTextEmpty) {
         this.wasEditTextEmpty = wasEditTextEmpty;
 
-        if(!this.wasEditTextEmpty)
+        if(!this.wasEditTextEmpty) {
             ignoreInput = true;
+        }else {
+            // on transcription or on composition
+            // the keyboard fires a wrong wasEditTextEmpty
+            // so we allow for a second one that is correct
+            if(MetricsController.getInstance().mode == StudyConstants.TRANSCRIPTION_MODE ||
+                    MetricsController.getInstance().mode == StudyConstants.COMPOSITION_MODE){
+
+                ignoreInput = false;
+            }
+        }
+
     }
 
     public ArrayList<Long> getTimePerWord() {
@@ -951,6 +962,7 @@ public class Logger {
 
         if(!wasEditTextEmpty)
             return;
+
 
         if(cursorChange.getNewSelStart() < compositionStartIndex){
             ignoreInput = true;

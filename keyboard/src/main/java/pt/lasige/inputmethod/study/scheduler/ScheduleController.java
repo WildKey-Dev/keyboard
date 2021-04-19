@@ -3,12 +3,14 @@ package pt.lasige.inputmethod.study.scheduler;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import pt.lasige.inputmethod.latin.settings.SettingsLauncherActivityUI;
 import pt.lasige.inputmethod.logger.DataBaseFacade;
 import pt.lasige.inputmethod.logger.data.Config;
 import pt.lasige.inputmethod.logger.data.Prompt;
@@ -26,6 +28,8 @@ public class ScheduleController {
     HashMap<String, Prompt> questions = new HashMap<>();
     HashMap<String, TimeFrame> timeFrames = new HashMap<>();
     PromptLauncherUIController promptUiController;
+    SettingsLauncherActivityUI settingsUiController;
+
     //for demo only
     ArrayList<String> questionList = new ArrayList<>();
     int questionListIndex = 0;
@@ -116,6 +120,9 @@ public class ScheduleController {
 
         if(promptUiController != null)
             promptUiController.setData(getQueue());
+
+        if(settingsUiController != null)
+            settingsUiController.refresh(getQueue());
     }
 
     public Prompt getPrompt(String promptID){
@@ -149,6 +156,8 @@ public class ScheduleController {
         if(promptUiController != null)
             promptUiController.setData(getQueue());
 
+        if(settingsUiController != null)
+            settingsUiController.refresh(getQueue());
         prompts.put(p.getPromptId(), p);
 
     }
@@ -183,6 +192,9 @@ public class ScheduleController {
         }
         if(promptUiController != null)
             promptUiController.setData(getQueue());
+
+        if(settingsUiController != null)
+            settingsUiController.refresh(getQueue());
 
     }
 
@@ -222,6 +234,9 @@ public class ScheduleController {
         if(promptUiController != null)
             promptUiController.setData(getQueue());
 
+        if(settingsUiController != null)
+            settingsUiController.refresh(getQueue());
+
     }
 
     public PromptLauncherUIController getPromptUiController() {
@@ -230,6 +245,10 @@ public class ScheduleController {
 
     public void setPromptUiController(PromptLauncherUIController promptUiController) {
         this.promptUiController = promptUiController;
+    }
+
+    public void setSettingsUiController(SettingsLauncherActivityUI settingsUiController) {
+        this.settingsUiController = settingsUiController;
     }
 
     public Prompt getAtomicPrompt(String id){

@@ -54,38 +54,46 @@ public class PromptLauncherUIController {
     public void setData(ArrayList<String> data) {
         this.data.clear();
         this.data.addAll(data);
-        if(this.data.isEmpty()) {
-            bt.setText(R.string.exit);
-            title.setText(String.format(context.getString(R.string.pending_tasks), "0"));
-            message.setVisibility(View.VISIBLE);
-            message.setText(String.format(context.getString(R.string.next_task), ScheduleController.getInstance().getNextQuestionDate()));
-        }else {
-            if (this.data.size() == 1)
-                title.setText(String.format(context.getString(R.string.pending_task), String.valueOf(this.data.size())));
-            else
-                title.setText(String.format(context.getString(R.string.pending_tasks), String.valueOf(this.data.size())));
+        try {
+            if (this.data.isEmpty()) {
+                bt.setText(R.string.exit);
+                title.setText(String.format(context.getString(R.string.pending_tasks), "0"));
+                message.setVisibility(View.VISIBLE);
+                message.setText(String.format(context.getString(R.string.next_task), ScheduleController.getInstance().getNextQuestionDate()));
+            } else {
+                if (this.data.size() == 1)
+                    title.setText(String.format(context.getString(R.string.pending_task), String.valueOf(this.data.size())));
+                else
+                    title.setText(String.format(context.getString(R.string.pending_tasks), String.valueOf(this.data.size())));
 
-            message.setVisibility(View.INVISIBLE);
-            bt.setText(R.string.start_next_task);
+                message.setVisibility(View.INVISIBLE);
+                bt.setText(R.string.start_next_task);
+            }
+        }catch (Exception e){
+
         }
     }
 
     public void refresh(Context context, ArrayList<String> data) {
-        this.data.clear();
-        this.data.addAll(data);
-        if(this.data.isEmpty()) {
-            bt.setText(R.string.exit);
-            title.setText(String.format(context.getString(R.string.pending_tasks), "0"));
-            message.setVisibility(View.VISIBLE);
-            message.setText(String.format(context.getString(R.string.next_task), ScheduleController.getInstance().getNextQuestionDate()));
-        }else {
-            if (this.data.size() == 1)
-                title.setText(String.format(context.getString(R.string.pending_task), String.valueOf(this.data.size())));
-            else
-                title.setText(String.format(context.getString(R.string.pending_tasks), String.valueOf(this.data.size())));
+        try {
+            this.data.clear();
+            this.data.addAll(data);
+            if(this.data.isEmpty()) {
+                bt.setText(R.string.exit);
+                title.setText(String.format(context.getString(R.string.pending_tasks), "0"));
+                message.setVisibility(View.VISIBLE);
+                message.setText(String.format(context.getString(R.string.next_task), ScheduleController.getInstance().getNextQuestionDate()));
+            }else {
+                if (this.data.size() == 1)
+                    title.setText(String.format(context.getString(R.string.pending_task), String.valueOf(this.data.size())));
+                else
+                    title.setText(String.format(context.getString(R.string.pending_tasks), String.valueOf(this.data.size())));
 
-            message.setVisibility(View.INVISIBLE);
-            bt.setText(R.string.start_next_task);
+                message.setVisibility(View.INVISIBLE);
+                bt.setText(R.string.start_next_task);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

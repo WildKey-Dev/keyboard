@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -163,8 +165,29 @@ public class CompositionActivity extends Activity {
             setContentView(R.layout.activity_composition);
             nextPhrase();
             DataBaseFacade.getInstance().setInitTS(studyID, questionID, System.currentTimeMillis());
+            EditText response = findViewById(R.id.et_response);
+            response.setOnEditorActionListener((view12, actionId, event) -> {
+                int result = actionId & EditorInfo.IME_MASK_ACTION;
+                switch(result) {
+                    case EditorInfo.IME_ACTION_DONE:
+                    case EditorInfo.IME_ACTION_NEXT:
+                        if (response.getText().toString().isEmpty()){
+                            Toast.makeText(getApplicationContext(), R.string.your_response_is_empty, Toast.LENGTH_SHORT).show();
+                        }else {
+                            recordMetrics();
+                            charsWritten += response.getText().toString().length();
+                            if(charsWritten > 75 || stop || this.index == phrases.length)
+                                finishTask(null);
+                            else
+                                nextPhrase();
+
+                            response.getText().clear();
+                        }
+                        break;
+                }
+                return true;
+            });
             findViewById(R.id.bt_next).setOnClickListener(view1 -> {
-                EditText response = findViewById(R.id.et_response);
                 if (response.getText().toString().isEmpty()){
                     Toast.makeText(getApplicationContext(), R.string.your_response_is_empty, Toast.LENGTH_SHORT).show();
                 }else {

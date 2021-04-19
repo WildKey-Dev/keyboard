@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import pt.lasige.inputmethod.study.PromptLauncherActivity;
 import pt.lasige.inputmethod.study.scheduler.ScheduleController;
 
 public class SettingsLauncherActivity extends Activity {
+    SettingsLauncherActivityUI settingsLauncherActivityUI;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -28,6 +30,12 @@ public class SettingsLauncherActivity extends Activity {
         Objects.requireNonNull(getActionBar()).setBackgroundDrawable(new ColorDrawable(getColor(R.color.study_accent_color)));
 
         DataBaseFacade.getInstance().setDemo(false);
+        settingsLauncherActivityUI =
+                new SettingsLauncherActivityUI(findViewById(R.id.tv_tasks_badge), findViewById(R.id.tasks_badge));
+
+        settingsLauncherActivityUI.refresh(ScheduleController.getInstance().getQueue());
+
+        ScheduleController.getInstance().setSettingsUiController(settingsLauncherActivityUI);
 
         findViewById(R.id.bt_start_settings).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,14 +59,7 @@ public class SettingsLauncherActivity extends Activity {
 //                startActivity(intent);
 //            }
 //        });
-        ArrayList<String> data = ScheduleController.getInstance().getQueue();
 
-        if(data.isEmpty()) {
-            findViewById(R.id.tasks_badge).setVisibility(View.GONE);
-        }else {
-            findViewById(R.id.tasks_badge).setVisibility(View.VISIBLE);
-            ((TextView) findViewById(R.id.tv_tasks_badge)).setText(String.valueOf(data.size()));
-        }
         findViewById(R.id.bt_start_prompt).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -66,5 +67,12 @@ public class SettingsLauncherActivity extends Activity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        settingsLauncherActivityUI.refresh(ScheduleController.getInstance().getQueue());
     }
 }

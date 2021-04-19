@@ -10,8 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.util.Log;
-import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -110,7 +109,7 @@ public class TranscriptionActivity extends Activity {
                     return;
                 }
 
-                 setStudy();
+                setStudy();
             };
 
             DataBaseFacade.getInstance().getCurrentPhrase(studyID, questionID, obs);
@@ -160,9 +159,28 @@ public class TranscriptionActivity extends Activity {
             setContentView(R.layout.activity_trasncription);
             nextPhrase();
             DataBaseFacade.getInstance().setInitTS(studyID, questionID, System.currentTimeMillis());
+            EditText response = findViewById(R.id.et_phrase);
+            response.setOnEditorActionListener((view12, actionId, event) -> {
+                int result = actionId & EditorInfo.IME_MASK_ACTION;
+                switch(result) {
+                    case EditorInfo.IME_ACTION_DONE:
+                    case EditorInfo.IME_ACTION_NEXT:
+                        if (response.getText().toString().isEmpty()){
+                            Toast.makeText(getApplicationContext(), R.string.your_response_is_empty, Toast.LENGTH_SHORT).show();
+                        }else {
+                            recordMetrics();
+                            if(stop || index == phrases.length)
+                                finishTask(null);
+                            else
+                                nextPhrase();
 
+                            response.getText().clear();
+                        }
+                        break;
+                }
+                return true;
+            });
             findViewById(R.id.bt_next).setOnClickListener(view1 -> {
-                EditText response = findViewById(R.id.et_phrase);
                 if (response.getText().toString().isEmpty()){
                     Toast.makeText(getApplicationContext(), R.string.your_response_is_empty, Toast.LENGTH_SHORT).show();
                 }else {
@@ -172,7 +190,7 @@ public class TranscriptionActivity extends Activity {
                     else
                         nextPhrase();
 
-                    response.setText("");
+                    response.getText().clear();
                 }
             });
         });
@@ -189,8 +207,10 @@ public class TranscriptionActivity extends Activity {
 
     private void recordMetrics(){
         DataBaseFacade.getInstance().setEndTS(studyID, questionID, System.currentTimeMillis());
+
         final Logger log = LoggerController.getInstance().getLogger();
         LoggerController.getInstance().resetLogger();
+
         MetricsController.getInstance().runMetricCalculation(log, currentTargetPhrase, questionID,
                 studyID, this.index-1);
     }

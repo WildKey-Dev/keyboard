@@ -160,8 +160,11 @@ public final class SuggestionStripView extends RelativeLayout implements OnClick
         if(data.isEmpty()) {
             tasksTODO.setVisibility(GONE);
         }else {
-            tasksTODO.setVisibility(VISIBLE);
-            tasksTODO.setText(String.valueOf(data.size()));
+            if(MetricsController.getInstance().mode == StudyConstants.IMPLICIT_MODE){
+                tasksTODO.setOnClickListener(this);
+                tasksTODO.setVisibility(VISIBLE);
+                tasksTODO.setText(String.valueOf(data.size()));
+            }
         }
 
         for (int pos = 0; pos < SuggestedWords.MAX_SUGGESTIONS; pos++) {
@@ -200,7 +203,6 @@ public final class SuggestionStripView extends RelativeLayout implements OnClick
         mVoiceKey.setOnClickListener(this);
 
         mKillSwitch.setOnClickListener(this);
-        tasksTODO.setOnClickListener(this);
         updateLogButtonVisibility();
     }
 

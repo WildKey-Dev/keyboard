@@ -109,7 +109,9 @@ public class FirebaseController {
 
                                 CompletedTask ct = snapshot.getValue(CompletedTask.class);
 
-                                if(ct != null && ct.getPhrases() != null && tasksToDo > ct.getPhrases().size()){
+                                if(ct != null && ct.getPhrases() == null){
+                                    ScheduleController.getInstance().enqueue(p, parent);
+                                }else if(ct != null && ct.getPhrases() != null && tasksToDo > ct.getPhrases().size()){
                                     ScheduleController.getInstance().enqueue(p, parent);
                                 }else if (snapshot.getValue() == null){
                                     ScheduleController.getInstance().enqueue(p, parent);
@@ -188,11 +190,6 @@ public class FirebaseController {
                                         write("model", Build.MODEL, "/users/"+user.getUid()+"/device/");
                                         write("release", Build.VERSION.RELEASE, "/users/"+user.getUid()+"/device/");
                                         write("sdk", Build.VERSION.SDK_INT, "/users/"+user.getUid()+"/device/");
-
-                                        if(saveEmail){
-                                            write("email", user.getEmail(), "/users/"+user.getUid()+"/");
-                                            write("name", user.getDisplayName(), "/users/"+user.getUid()+"/");
-                                        }
 
                                         write("fcmToken", token, "/users/"+user.getUid()+"/");
                                         setConfigIDListener(context);

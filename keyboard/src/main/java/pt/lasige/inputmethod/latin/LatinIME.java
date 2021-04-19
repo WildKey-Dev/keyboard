@@ -521,7 +521,6 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
                     latinIme.onStartInputViewInternal(editorInfo, restarting);
                     mAppliedEditorInfo = editorInfo;
 
-
                     LoggerController.getInstance().getLogger().setWasEditTextEmpty(latinIme.mInputLogic.wasEditTextEmpty());
                     LoggerController.getInstance().getLogger().setCompositionStartIndex(latinIme.mInputLogic.getComposingStart());
 

@@ -255,18 +255,10 @@ public class MetricsController {
                 @Override
                 public void run() {
                     calculateAll(log, targetPhrase, questionID, studyID, phraseNumber, false);
-                }
-            };
-            executor.execute(thread);
-
-            //calculate other time with OUR GENERATED target phrase
-            Thread thread2 = new Thread() {
-                @Override
-                public void run() {
                     calculateAll(log, null, questionID+"-generated-target-phrase", studyID, phraseNumber, false);
                 }
             };
-            executor.execute(thread2);
+            executor.execute(thread);
         }else {
             Thread thread = new Thread() {
                 @Override
