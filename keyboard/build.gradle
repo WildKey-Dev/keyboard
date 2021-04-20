@@ -24,8 +24,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 36
-        versionName "1.0.5"
+        versionCode 38
+        versionName "1.0.7"
         signingConfig signingConfigs.release
     }
 
@@ -57,25 +57,6 @@ android {
     }
 
     def ndkProjectPath="src/main"
-
-    // file: local.properties should have something like this:
-    // ndk.dir=C\:\\Program_Files\\Android\\android-ndk-r10e
-    // sdk.dir=C\:\\Program Files (x86)\\Android\\android-sdk
-//    task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
-//        Properties properties = new Properties()
-//        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-//        def ndkDir = properties.getProperty('ndk.dir')
-//        def ndkCmd = ''
-//        if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//            ndkCmd = 'ndk-build.cmd'
-//        } else {
-//            ndkCmd = 'ndk-build'
-//        }
-//        commandLine "${ndkDir}/${ndkCmd}",
-//                "NDK_PROJECT_PATH=${ndkProjectPath}",
-//                "APP_BUILD_SCRIPT=${ndkProjectPath}/jni/Android.mk",
-//                "NDK_APPLICATION_MK=${ndkProjectPath}/jni/Application.mk"
-//    }
 
     task ndkLibsToJar(type: Zip, description: 'Create a JAR of the native libs') {
         destinationDir new File(buildDir, 'libs')

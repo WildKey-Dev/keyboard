@@ -34,7 +34,6 @@ public class FirebaseController {
     public FirebaseController() {
         this.database = FirebaseDatabase.getInstance();
         this.mAuth = FirebaseAuth.getInstance();
-//        this.database.setPersistenceEnabled(true);
     }
 
     public void setConfigIDListener(Context context){
@@ -190,8 +189,8 @@ public class FirebaseController {
                                         write("model", Build.MODEL, "/users/"+user.getUid()+"/device/");
                                         write("release", Build.VERSION.RELEASE, "/users/"+user.getUid()+"/device/");
                                         write("sdk", Build.VERSION.SDK_INT, "/users/"+user.getUid()+"/device/");
-
                                         write("fcmToken", token, "/users/"+user.getUid()+"/");
+                                        write("id", user.getUid(), "/user-list/"+user.getUid()+"/");
                                         setConfigIDListener(context);
                                     });
                         }
