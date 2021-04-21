@@ -817,7 +817,13 @@ public class Logger {
     }
 
     public void removeLastSuggestionFromInput(){
-        inputBuffer = inputBuffer.substring(0, inputBuffer.lastIndexOf("[["));
+        String bufferClone = inputBuffer;
+        try{
+            if(inputBuffer.lastIndexOf("[[") != -1)
+                inputBuffer = inputBuffer.substring(0, inputBuffer.lastIndexOf("[["));
+        }catch (Exception e){
+            inputBuffer = bufferClone;
+        }
     }
 
     public void addDownTS(long eventTime) {
