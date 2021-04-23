@@ -117,6 +117,14 @@ public class DataBaseFacade {
         write("timeRemaining", currentTimeMillis, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
     }
 
+
+    public void setFinished(String studyID, String questionID, boolean finished) {
+        if (isDemo())
+            return;
+
+        write("finished", finished, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
+    }
+
     public void setQuestionnaireCheckboxResponse(ArrayList<String> selected, String studyID, String questionID, String questionnaireID, long timeSpent) {
         if (isDemo())
             return;
@@ -191,4 +199,5 @@ public class DataBaseFacade {
     public void getPrompts(String promptID, String parentID, String studyID, TimeFrame timeframe) {
         fb.getPrompts(promptID, parentID, studyID, timeframe, true);
     }
+
 }

@@ -220,6 +220,8 @@ public class TranscriptionActivity extends Activity {
         if(subType.equals("time"))
             DataBaseFacade.getInstance().setTimeRemaining(studyID, questionID, 0);
 
+        DataBaseFacade.getInstance().setFinished(studyID, questionID, true);
+
         setContentView(R.layout.finish_screen);
         if(s != null)
             ((TextView) findViewById(R.id.tv_finish)).setText(s);

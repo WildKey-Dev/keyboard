@@ -108,6 +108,9 @@ public class FirebaseController {
 
                                 CompletedTask ct = snapshot.getValue(CompletedTask.class);
 
+                                if(ct != null && ct.isFinished())
+                                    return;
+
                                 if(ct != null && ct.getPhrases() == null){
                                     ScheduleController.getInstance().enqueue(p, parent);
                                 }else if(ct != null && ct.getPhrases() != null && tasksToDo > ct.getPhrases().size()){

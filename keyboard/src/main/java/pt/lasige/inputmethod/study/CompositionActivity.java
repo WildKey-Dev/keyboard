@@ -226,6 +226,8 @@ public class CompositionActivity extends Activity {
             DataBaseFacade.getInstance().setTimeRemaining(studyID, questionID, 0);
         }
 
+        DataBaseFacade.getInstance().setFinished(studyID, questionID, true);
+
         setContentView(R.layout.finish_screen);
         if(s != null)
             ((TextView) findViewById(R.id.tv_finish)).setText(s);

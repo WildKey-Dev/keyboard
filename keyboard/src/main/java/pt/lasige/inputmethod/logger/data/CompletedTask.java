@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class CompletedTask {
     ArrayList<Object> phrases;
+    boolean finished;
 
     public CompletedTask() { }
 
@@ -13,5 +14,13 @@ public class CompletedTask {
 
     public void setPhrases(ArrayList<Object> phrases) {
         this.phrases = phrases;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 }

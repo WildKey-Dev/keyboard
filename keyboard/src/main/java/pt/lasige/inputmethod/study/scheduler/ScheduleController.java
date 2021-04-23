@@ -104,7 +104,6 @@ public class ScheduleController {
                     tf.getMonth(),
                     tf.getYear());
 
-
             if(dNow.after(dStart) && dNow.before(dEnd)) {
                 for (String s: tf.getTasks()){
                     if(queue.contains(tf.getTimeFrameID()+"_"+s))
