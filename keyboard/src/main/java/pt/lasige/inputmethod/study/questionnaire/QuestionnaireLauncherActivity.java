@@ -145,8 +145,8 @@ public class QuestionnaireLauncherActivity extends Activity {
                 step = new ScaleButtonCustom(
                         p.getQuestion(),
                         getString(R.string.next),
-                        "Concordo totalmente",
-                        "Discordo totalmente",
+                        "Very Likely",
+                        "Very Unlikely",
                         p.getScaleSteps(),
                         false,
                         new StepIdentifier(p.getPromptId()));
@@ -296,7 +296,6 @@ public class QuestionnaireLauncherActivity extends Activity {
 
             switch ((String) t.t1){
                 case "questionnaire_one_choice":
-
                     DataBaseFacade.getInstance().setQuestionnaireRadioResponse(
                             qdh.getResponse(),
                             qdh.getStudyID(),
