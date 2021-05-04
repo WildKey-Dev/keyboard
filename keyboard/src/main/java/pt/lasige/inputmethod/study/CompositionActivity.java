@@ -57,69 +57,70 @@ public class CompositionActivity extends Activity {
 
         showProgressDialog();
 
-        if(subType.equals("time")){
-            PhraseObserver obs = param -> {
-                //only update the UI when the firebase has responded
-                //not the best bue this way we ensure that the user doesn't do anything wrong
-                dismissProgressDialog();
-                setContentView(R.layout.start_screen);
-                ((TextView) findViewById(R.id.tv_task)).setText(R.string.composition_desc);
-                long timer = i.getIntExtra("duration",0);
+        PhraseObserver obs = phrasesAlreadySaved -> {
 
-                //if is a paused task we update the string on the button
-                //and record the TimeStamp
-                if(param != 0) {
-                    ((Button) findViewById(R.id.bt_start)).setText(R.string.str_continue);
-                    timer = param;
-                    recordEndPauseTS = true;
-                }else if(this.index == phrases.length){
-                    //the user has already completed the test
-                    finishTask("You already have completed this task");
-                    return;
-                }
+            //only update the UI when the firebase has responded
+            //not the best bue this way we ensure that the user doesn't do anything wrong
+            dismissProgressDialog();
+            setContentView(R.layout.start_screen);
+            ((TextView) findViewById(R.id.tv_task)).setText(R.string.composition_desc);
 
-                //if the task has a time period to end
-                //if the task was paused we get the remaining recorded time
-                //we use the default value otherwise
-                new CountDownTimer(timer * 60 * 1000, 60 * 1000) {
-                    public void onTick(long millisUntilFinished) {
-                        timeRemaining = millisUntilFinished;}
-                    public void onFinish(){stop = true;}
-                }.start();
+            //if it is a paused task we start on the last recorded index
+            //and update the string on the button
+            //and record the TimeStamp
+            this.index = (int) phrasesAlreadySaved;
+            if(this.index != 0) {
+                ((Button) findViewById(R.id.bt_start)).setText(R.string.str_continue);
+                recordEndPauseTS = true;
+            }else if(this.index == phrases.length){
+                //the user has already completed the test
+                finishTask("You already have completed this task");
+                return;
+            }
 
+            if(subType.equals("time")){
+                PhraseObserver obsTime = time -> {
+                    //only update the UI when the firebase has responded
+                    //not the best bue this way we ensure that the user doesn't do anything wrong
+                    dismissProgressDialog();
+                    setContentView(R.layout.start_screen);
+                    ((TextView) findViewById(R.id.tv_task)).setText(R.string.composition_desc);
+                    long timer = i.getIntExtra("duration",0);
+
+                    //if is a paused task we update the string on the button
+                    //and record the TimeStamp
+                    if(time != 0) {
+                        ((Button) findViewById(R.id.bt_start)).setText(R.string.str_continue);
+                        timer = time;
+                        recordEndPauseTS = true;
+                    }else if(this.index == phrases.length){
+                        //the user has already completed the test
+                        finishTask("You already have completed this task");
+                        return;
+                    }
+
+                    //if the task has a time period to end
+                    //if the task was paused we get the remaining recorded time
+                    //we use the default value otherwise
+                    new CountDownTimer(timer * 60 * 1000, 60 * 1000) {
+                        public void onTick(long millisUntilFinished) {
+                            timeRemaining = millisUntilFinished;}
+                        public void onFinish(){stop = true;}
+                    }.start();
+
+                    setStudy();
+                };
+
+                DataBaseFacade.getInstance().getTimeRemaining(studyID, questionID, obsTime);
+
+            }else {
                 setStudy();
-            };
+            }
+        };
 
-            DataBaseFacade.getInstance().getTimeRemaining(studyID, questionID, obs);
-
-        }else {
-            PhraseObserver obs = param -> {
-
-                //only update the UI when the firebase has responded
-                //not the best bue this way we ensure that the user doesn't do anything wrong
-                dismissProgressDialog();
-                setContentView(R.layout.start_screen);
-                ((TextView) findViewById(R.id.tv_task)).setText(R.string.composition_desc);
-
-                //if it is a paused task we start on the last recorded index
-                //and update the string on the button
-                //and record the TimeStamp
-                this.index = (int) param;
-                if(this.index != 0) {
-                    ((Button) findViewById(R.id.bt_start)).setText(R.string.str_continue);
-                    recordEndPauseTS = true;
-                }else if(this.index == phrases.length){
-                    //the user has already completed the test
-                    finishTask("You already have completed this task");
-                    return;
-                }
-
-                setStudy();
-            };
-
-            DataBaseFacade.getInstance().getCurrentPhrase(studyID, questionID, obs);
-        }
+        DataBaseFacade.getInstance().getCurrentPhrase(studyID, questionID, obs);
     }
+
 
     private void showProgressDialog() {
         if(progressDialog != null)
