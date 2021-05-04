@@ -969,7 +969,6 @@ public class Logger {
         if(!wasEditTextEmpty)
             return;
 
-
         if(cursorChange.getNewSelStart() < compositionStartIndex){
             ignoreInput = true;
             outPhraseTS = System.currentTimeMillis();

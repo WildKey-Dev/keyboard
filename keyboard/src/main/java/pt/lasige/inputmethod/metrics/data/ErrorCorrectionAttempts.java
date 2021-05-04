@@ -25,6 +25,6 @@ public class ErrorCorrectionAttempts extends Metric {
                 lastInput = true;
             }
         }
-        return attempts; //a "word" is any five characters
+        return attempts;
     }
 }
