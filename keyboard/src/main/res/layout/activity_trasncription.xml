@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pt.lasige.inputmethod.study.TranscriptionActivity">
+    tools:context="uk.openlab.inputmethod.study.TranscriptionActivity">
 
     <TextView
         android:id="@+id/tv_phrase"

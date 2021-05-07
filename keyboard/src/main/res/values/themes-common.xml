@@ -105,9 +105,9 @@
     <style
         name="MainKeyboardView"
         parent="KeyboardView" />
-    <!-- Though {@link pt.lasige.inputmethod.keyboard.emoji.EmojiPalettesView} doesn't extend
-         {@link pt.lasige.inputmethod.keyboard.KeyboardView}, some views inside it, for instance
-         delete button, need themed {@link pt.lasige.inputmethod.keyboard.KeyboardView}
+    <!-- Though {@link uk.openlab.inputmethod.keyboard.emoji.EmojiPalettesView} doesn't extend
+         {@link uk.openlab.inputmethod.keyboard.KeyboardView}, some views inside it, for instance
+         delete button, need themed {@link uk.openlab.inputmethod.keyboard.KeyboardView}
          attributes. -->
     <style name="EmojiPalettesView" />
     <style name="MoreKeysKeyboard" />
