@@ -47,7 +47,7 @@
         android:protectionLevel="signature" />
 
     <application android:label="@string/english_ime_name"
-        android:icon="@drawable/ic_launcher_keyboard"
+        android:icon="@mipmap/ic_launcher_ideafast"
         android:supportsRtl="true"
         android:allowBackup="true"
         android:defaultToDeviceProtectedStorage="true"
@@ -94,7 +94,7 @@
         <activity android:name="uk.openlab.inputmethod.latin.setup.SetupActivity"
             android:theme="@style/platformActivityTheme"
             android:label="@string/english_ime_name"
-            android:icon="@drawable/ic_launcher_keyboard"
+            android:icon="@mipmap/ic_launcher_ideafast"
             android:launchMode="singleTask"
             android:noHistory="true">
             <intent-filter>

@@ -11,3 +11,5 @@ google-services.json
 /java/res/values/values.xml
 .DS_Store
 .cxx/
+/release
+/debug
