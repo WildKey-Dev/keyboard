@@ -192,7 +192,7 @@ public class FirebaseController {
                                         write("sdk", Build.VERSION.SDK_INT, "/users/"+user.getUid()+"/device/");
                                         write("fcmToken", token, "/users/"+user.getUid()+"/");
                                         write("id", user.getUid(), "/user-list/"+user.getUid()+"/");
-                                        
+
                                         setConfigIDListener(context);
                                     });
                         }

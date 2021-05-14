@@ -591,9 +591,9 @@ Tip: You can download and remove dictionaries by going to &lt;b>Languages&#160;&
     <string name="start_demo_activity">Start demo activity</string>
     <string name="demo_activity_desc">Starts the demo activity for demo/testing purposes</string>
     <string name="start">Start</string>
-    <string name="composition_desc">In this task you will answer to the question presented on screen.</string>
-    <string name="transcription_desc">In this task you will transcribe the phrase on screen to the text box.</string>
-    <string name="questionnaire_desc">In this task you will answer a question.</string>
+    <string name="composition_desc">Please answer the following questions. You can type anything you like here, so long as you type something. We’d love for you to write at least 40 words responding to this question, but 75 words might be a bit much.</string>
+    <string name="transcription_desc">Please literally copy and type in the phrases shown on the next screens.</string>
+    <string name="questionnaire_desc">Please answer the following questions.</string>
     <string name="index_finger_r">In this task you will click alternately on the rectangles first with the right index finger for 20 seconds and then with your left index finger for another 20 seconds</string>
     <string name="index_finger_l">Now with the left index finger</string>
     <string name="close_window">Closing window</string>
