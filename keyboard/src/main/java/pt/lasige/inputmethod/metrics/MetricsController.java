@@ -79,74 +79,214 @@ public class MetricsController {
             //fresh trial
             trial = configTrial(log, targetPhrase, removeSuggestionsFromInputStream);
 
-            int eca, wc, autoC, ss, vi, wn, wsc, ac, cac, eac;
-            double wpm, cpa, cpc, cpe, ae, ce, ee;
-            float uer, cer, ter, oer, ier, ser, tcc;
-            ArrayList<Tuple> toe, tmm;
-            ArrayList<Long> htd, ft, tpw, top;
-            String myInputStream = log.getInputBuffer(false);
-            String myTranscribe = log.getTranscribe();
-            double time = (log.getFlightTimeBuffer().get(log.getFlightTimeBuffer().size()-1) -
-                    log.getFlightTimeBuffer().get(0));
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("discarded", "something went wrong with trial calculation", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+            DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+            e.printStackTrace();
+        }
 
+        int eca, wc, autoC, ss, vi, wn, wsc, ac, cac, eac;
+        double wpm, cpa, cpc, cpe, ae, ce, ee;
+        float uer, cer, ter, oer, ier, ser, tcc;
+        ArrayList<Tuple> toe, tmm;
+        ArrayList<Long> htd, ft, tpw, top;
+        String myInputStream = log.getInputBuffer(false);
+        String myTranscribe = log.getTranscribe();
+        double time = (log.getFlightTimeBuffer().get(log.getFlightTimeBuffer().size()-1) -
+                log.getFlightTimeBuffer().get(0));
+
+        try{
             wpm = new WordsPerMinute().execute(log.getTranscribe(), time);
-
-            uer = new UncorrectedErrorRate().execute(trial.getTrial());
-            cer = new CorrectedErrorRate().execute(trial.getTrial());
-            ter = new TotalErrorRate().execute(trial.getTrial());
-            oer = new OmissionErrorRate().execute(trial.getTrial());
-            ier = new InsertionErrorRate().execute(trial.getTrial());
-            ser = new SubstitutionsErrorRate().execute(trial.getTrial());
+            DataBaseFacade.getInstance().write("words-per-minute", wpm, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("words-per-minute", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
+            if(trial == null){
+                DataBaseFacade.getInstance().write("uncorrected-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }else {
+                uer = new UncorrectedErrorRate().execute(trial.getTrial());
+                DataBaseFacade.getInstance().write("uncorrected-error-rate", uer, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("uncorrected-error-rate", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
+            if(trial == null){
+                DataBaseFacade.getInstance().write("corrected-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }else {
+                cer = new CorrectedErrorRate().execute(trial.getTrial());
+                DataBaseFacade.getInstance().write("corrected-error-rate", cer, "/users/" + DataBaseFacade.getInstance().getFbUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
+            }
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("corrected-error-rate", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
+            if(trial == null){
+                DataBaseFacade.getInstance().write("total-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }else {
+                ter = new TotalErrorRate().execute(trial.getTrial());
+                DataBaseFacade.getInstance().write("total-error-rate", ter, "/users/" + DataBaseFacade.getInstance().getFbUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
+            }
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("total-error-rate", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
+            if(trial == null){
+                DataBaseFacade.getInstance().write("omission-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }else {
+                oer = new OmissionErrorRate().execute(trial.getTrial());
+                DataBaseFacade.getInstance().write("omission-error-rate", oer, "/users/" + DataBaseFacade.getInstance().getFbUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
+            }
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("omission-error-rate", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
+            if(trial == null){
+                DataBaseFacade.getInstance().write("insertions-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }else {
+                ier = new InsertionErrorRate().execute(trial.getTrial());
+                DataBaseFacade.getInstance().write("insertions-error-rate", ier, "/users/" + DataBaseFacade.getInstance().getFbUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
+            }
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("insertions-error-rate", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
+            if(trial == null){
+                DataBaseFacade.getInstance().write("substitutions-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }else {
+                ser = new SubstitutionsErrorRate().execute(trial.getTrial());
+                DataBaseFacade.getInstance().write("substitutions-error-rate", ser, "/users/" + DataBaseFacade.getInstance().getFbUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
+            }
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("substitutions-error-rate", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             eca = new ErrorCorrectionAttempts().execute(log);
+            DataBaseFacade.getInstance().write("error-correction-attempts", eca, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("error-correction-attempts", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             toe = new TouchOffsetEntered().execute(log);
-            new TouchOffsetTarget().execute();
-            new TouchOffsetError().execute();
+            DataBaseFacade.getInstance().write("touch-offset-entered", toe, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("touch-offset-entered", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             tmm = new TouchMajorMinor().execute(log);
+            DataBaseFacade.getInstance().write("touch-major-and-minor", tmm, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("touch-major-and-minor", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             htd = new HoldTimeDeviations().execute(log);
+            DataBaseFacade.getInstance().write("holdtime-deviations", htd, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("holdtime-deviations", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             ft = new FlightTime().execute(log);
+            DataBaseFacade.getInstance().write("flight-time", ft, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("flight-time", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             wc = new WrittenCharacters().execute(log);
+            DataBaseFacade.getInstance().write("written-characters", wc, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("written-characters", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             wn = new WrittenNumbers().execute(log);
+            DataBaseFacade.getInstance().write("written-numbers", wn, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("written-numbers", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             wsc = new WrittenSpecialChars().execute(log);
+            DataBaseFacade.getInstance().write("written-special-characters", wsc, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("written-special-characters", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             vi = new VoiceInput().execute(log);
+            DataBaseFacade.getInstance().write("voice-input", vi, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("voice-input", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             ss = new SelectedSuggestions().execute(log);
+            DataBaseFacade.getInstance().write("select-suggestions", ss, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("select-suggestions", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             autoC = new AutoCorrections().execute(log);
+            DataBaseFacade.getInstance().write("auto-correct", autoC, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("auto-correct", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             tpw = new TimePerWord().execute(log);
-            tcc = new TotalChangedCharacters().execute(trial.getTrial());
+            DataBaseFacade.getInstance().write("time-per-word", tpw, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("time-per-word", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
+            if(trial == null){
+                DataBaseFacade.getInstance().write("total-changed-characters", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }else {
+                tcc = new TotalChangedCharacters().execute(trial.getTrial());
+                DataBaseFacade.getInstance().write("total-changed-characters", tcc, "/users/" + DataBaseFacade.getInstance().getFbUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
+            }
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("total-changed-characters", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             ac = new ActionCount().execute(log);
+            DataBaseFacade.getInstance().write("action-count", ac, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("action-count", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             cac = new CorrectionActionCount().execute(log);
+            DataBaseFacade.getInstance().write("correction-action-count", cac, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("correction-action-count", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             eac = new EntryActionCount().execute(log);
+            DataBaseFacade.getInstance().write("entry-action-count", eac, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("entry-action-count", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
             top = new TimeOutsidePhrase().execute(log);
+            DataBaseFacade.getInstance().write("time-outside-phrase", top, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("time-outside-phrase", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
 
+        try {
             if(myInputStream.split(" ").length != myTranscribe.split(" ").length) {
                 DataBaseFacade.getInstance().write("warning-input-transcribe-length-different", (myInputStream.split(" ").length - myTranscribe.split(" ").length), "/users/" + DataBaseFacade.getInstance().getFbUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
             }
-            DataBaseFacade.getInstance().write("words-per-minute", wpm, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("uncorrected-error-rate", uer, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("corrected-error-rate", cer, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("total-error-rate", ter, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("omission-error-rate", oer, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("insertions-error-rate", ier, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("substitutions-error-rate", ser, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("error-correction-attempts", eca, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("touch-offset-entered", toe, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("touch-major-and-minor", tmm, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("holdtime-deviations", htd, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("flight-time", ft, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("written-characters", wc, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("written-numbers", wn, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("written-special-characters", wsc, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("voice-input", vi, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("select-suggestions", ss, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("auto-correct", autoC, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("time-per-word", tpw, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("warning-input-transcribe-length-different", e.getMessage(), "/users/" + DataBaseFacade.getInstance().getFbUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
+        }
+        try {
             DataBaseFacade.getInstance().write("cursor-changes", log.getCursorMoves(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("total-changed-characters", tcc, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("action-count", ac, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("correction-action-count", cac, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("entry-action-count", eac, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("cursor-changes", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try {
             DataBaseFacade.getInstance().write("input-timestamps", log.getInputTimeStamps(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            DataBaseFacade.getInstance().write("time-outside-phrase", top, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("input-timestamps", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
 
+        try{
             //Language
             DataBaseFacade.getInstance().write(
                     "country",
@@ -172,26 +312,67 @@ public class MetricsController {
                     "tag",
                     String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().toLanguageTag()),
                     "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
-
-
-            if(mode == StudyConstants.IMPLICIT_MODE){
-            }else if(mode == StudyConstants.TRANSCRIPTION_MODE){
-                DataBaseFacade.getInstance().write("input-stream-og", log.getOriginalInputBuffer(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                DataBaseFacade.getInstance().write("input-stream", trial.getTrial().getInputStream(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                DataBaseFacade.getInstance().write("target_phrase", trial.getTrial().getRequiredSentence(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                DataBaseFacade.getInstance().write("transcribe", trial.getTrial().getTranscribedSentence(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                if (LoggerController.getInstance().isLogTouch()){
-                    DataBaseFacade.getInstance().write("motion", log.getMotion(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                    DataBaseFacade.getInstance().write("keys", log.getKeys(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-                }
-            }else if(mode == StudyConstants.COMPOSITION_MODE){
-                DataBaseFacade.getInstance().write("target_phrase", trial.getTrial().getRequiredSentence(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-            }
         }catch (Exception e){
-            DataBaseFacade.getInstance().write("discarded", "something went wrong with metrics calculation", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
-            DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
-            e.printStackTrace();
+            DataBaseFacade.getInstance().write(
+                    "language",
+                    String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().getDisplayLanguage()),
+                    "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
         }
+
+        if(mode == StudyConstants.IMPLICIT_MODE){
+        }else if(mode == StudyConstants.TRANSCRIPTION_MODE || mode == StudyConstants.COMPOSITION_MODE){
+            try {
+                DataBaseFacade.getInstance().write("input-stream-og", log.getOriginalInputBuffer(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }catch (Exception e){
+                DataBaseFacade.getInstance().write("input-stream-og", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }
+            try {
+                if(trial == null)
+                    DataBaseFacade.getInstance().write("input-stream", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                else
+                    DataBaseFacade.getInstance().write("input-stream", trial.getTrial().getInputStream(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }catch (Exception e){
+                DataBaseFacade.getInstance().write("input-stream", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }
+            try {
+                if(trial == null)
+                    DataBaseFacade.getInstance().write("target_phrase", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                else
+                    DataBaseFacade.getInstance().write("target_phrase", trial.getTrial().getRequiredSentence(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }catch (Exception e){
+                DataBaseFacade.getInstance().write("target_phrase", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }
+            try {
+                if(trial == null)
+                    DataBaseFacade.getInstance().write("transcribe", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                else
+                    DataBaseFacade.getInstance().write("transcribe", trial.getTrial().getTranscribedSentence(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }catch (Exception e){
+                DataBaseFacade.getInstance().write("transcribe", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }
+            if (LoggerController.getInstance().isLogTouch()){
+                try {
+                    DataBaseFacade.getInstance().write("motion", log.getMotion(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                }catch (Exception e){
+                    DataBaseFacade.getInstance().write("motion", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                }
+                try {
+                    DataBaseFacade.getInstance().write("keys", log.getKeys(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                }catch (Exception e){
+                    DataBaseFacade.getInstance().write("keys", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                }
+            }
+        }
+//        else if(mode == StudyConstants.COMPOSITION_MODE){
+//            try {
+//                if(trial == null)
+//                    DataBaseFacade.getInstance().write("target_phrase", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+//                else
+//                    DataBaseFacade.getInstance().write("target_phrase", trial.getTrial().getRequiredSentence(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+//            }catch (Exception e){
+//                DataBaseFacade.getInstance().write("target_phrase", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+//            }
+//        }
 
         //clean memory
         //log.clearBuffers();//no need anymore

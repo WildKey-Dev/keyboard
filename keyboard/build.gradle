@@ -24,8 +24,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 39
-        versionName "1.0.8"
+        versionCode 40
+        versionName "1.0.9"
         signingConfig signingConfigs.release
     }
 
@@ -68,11 +68,6 @@ android {
 
     tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn ndkLibsToJar
-    }
-
-    clean.doFirst {
-        delete "${ndkProjectPath}/libs"
-        delete "${ndkProjectPath}/obj"
     }
 
     buildToolsVersion '29.0.2'
