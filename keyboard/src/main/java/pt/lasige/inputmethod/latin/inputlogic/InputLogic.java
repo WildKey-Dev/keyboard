@@ -415,8 +415,7 @@ public final class InputLogic {
                     newSelStart, newSelEnd, false /* shouldFinishComposition */);
         }
 
-        LoggerController.getInstance().getLogger().incCursorMoves();
-        LoggerController.getInstance().getLogger().addCursorChange(new CursorChange(oldSelStart, oldSelEnd, newSelStart, newSelEnd));
+        LoggerController.getInstance().getLogger().addCursorChange(new CursorChange(oldSelStart, oldSelEnd, newSelStart, newSelEnd, System.currentTimeMillis()));
 
         // The cursor has been moved : we now accept to perform recapitalization
         mRecapitalizeStatus.enable();
