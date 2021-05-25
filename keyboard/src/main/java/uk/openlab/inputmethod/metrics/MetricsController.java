@@ -79,7 +79,6 @@ public class MetricsController {
         }catch (Exception e){
             DataBaseFacade.getInstance().write("discarded", "something went wrong with trial calculation", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
             DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
-            e.printStackTrace();
         }
 
         int eca, wc, autoC, ss, vi, wn, wsc, ac, cac, eac;
@@ -347,6 +346,11 @@ public class MetricsController {
             }catch (Exception e){
                 DataBaseFacade.getInstance().write("transcribe", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }
+            try {
+                DataBaseFacade.getInstance().write("cursor-changes", log.getCursorChanges(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }catch (Exception e){
+                DataBaseFacade.getInstance().write("cursor-changes", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }
             if (LoggerController.getInstance().isLogTouch()){
                 try {
                     DataBaseFacade.getInstance().write("motion", log.getMotion(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
@@ -360,19 +364,8 @@ public class MetricsController {
                 }
             }
         }
-//        else if(mode == StudyConstants.COMPOSITION_MODE){
-//            try {
-//                if(trial == null)
-//                    DataBaseFacade.getInstance().write("target_phrase", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-//                else
-//                    DataBaseFacade.getInstance().write("target_phrase", trial.getTrial().getRequiredSentence(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-//            }catch (Exception e){
-//                DataBaseFacade.getInstance().write("target_phrase", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
-//            }
-//        }
 
         //clean memory
-        //log.clearBuffers();//no need anymore
         if(trial != null)
             trial.stopTrial();
     }
@@ -439,7 +432,7 @@ public class MetricsController {
             Thread thread = new Thread() {
                 @Override
                 public void run() {
-                    calculateAll(log, targetPhrase, questionID, studyID, phraseNumber, false);
+                    calculateAll(log, null, questionID, studyID, phraseNumber, false);
                 }
             };
             executor.execute(thread);

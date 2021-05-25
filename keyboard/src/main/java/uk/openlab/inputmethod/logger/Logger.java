@@ -1,5 +1,6 @@
 package uk.openlab.inputmethod.logger;
 
+import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ public class Logger {
     private ArrayList<Tuple> keys = new ArrayList<>();
     private final ArrayList<Tuple> actions = new ArrayList<>();
     private final ArrayList<Long> inputTimeStamps = new ArrayList<>();
-    //    private ArrayList<String> spellChecker = new ArrayList<>();
     private final ArrayList<SuggestedWords> suggestions = new ArrayList<>();
     private final HashMap<String, ArrayList<Tuple>> mSuggestedWordsHashMap = new HashMap<>();
     private long downTS, wordStartTS, wordFinishTS, outPhraseTS = -1;
@@ -42,8 +42,9 @@ public class Logger {
             lastSpaceWasProgrammatic = false, willAutoCorrect = false, autoCorrected = false,
             lastInputWasDeletable = false;
     private final boolean onlyCountFirstSubstitutionForEachWord = false;
-    private boolean isCursorOnEnd = true, ignoreInput = false, wasEditTextEmpty;
-    private int numbers = 0, specialChars = 0, suggestionsSelected = 0, autoCorrection = 0, voiceInput = 0, cursorMoves = 0, compositionStartIndex = 0, discardedChars = 0;
+    private boolean isCursorOnEnd = true, ignoreInput = false, wasEditTextEmpty = true;
+    private int numbers = 0, specialChars = 0, suggestionsSelected = 0, autoCorrection = 0,
+            voiceInput = 0, cursorMoves = 0, compositionStartIndex = 0, discardedChars = 0;
     private final ArrayList<CursorChange> cursorChanges = new ArrayList<>();
     private SuggestedWords currentSuggestionList;
 
@@ -144,6 +145,10 @@ public class Logger {
         return cursorMoves;
     }
 
+    public ArrayList<CursorChange> getCursorChanges() {
+        return cursorChanges;
+    }
+
     public int getNumbers() {
         return numbers;
     }
@@ -177,6 +182,7 @@ public class Logger {
     }
 
     public void setWasEditTextEmpty(boolean wasEditTextEmpty) {
+
         this.wasEditTextEmpty = wasEditTextEmpty;
 
         if(!this.wasEditTextEmpty) {
@@ -191,7 +197,6 @@ public class Logger {
                 ignoreInput = false;
             }
         }
-
     }
 
     public ArrayList<Long> getTimePerWord() {
@@ -209,148 +214,153 @@ public class Logger {
     public String getInputBuffer(boolean removeSuggestionsFromInputStream) {
 
         try{
-        //remove space on the end if there is one
-        trimActionsArray();
-        StringBuilder newInputBuffer = new StringBuilder();
-        String newWord, oldWord;
-        String[] data = splitBuffer(fixBuffer(consolidateBuffer(inputBuffer)));
+            //remove space on the end if there is one
+            trimActionsArray();
+            StringBuilder newInputBuffer = new StringBuilder();
+            String newWord, oldWord;
+            String[] data = splitBuffer(fixBuffer(consolidateBuffer(inputBuffer)));
 
-        for (int i = 0; i < data.length; i++){
-            if(data[i].contains("[[")){
-                newWord = data[i].substring(data[i].indexOf("[[") + 2, data[i].indexOf("]]"));
-
-                if(data[i].charAt(data[i].indexOf("[[")-1) == '<' && data[i].charAt(data[i].indexOf("[[")-2) == '<'){
-                    if(i > 0)
-                        oldWord = data[i-1];
-                    else
-                        oldWord = "";
-                }else {
-                    oldWord = substituteDeletedSuggestions(substituteDeletedChars(data[i]));
-                }
-                if(newWord.equals(oldWord)) {
-                    newInputBuffer.append(data[i]);
-                }else {
-                    //Special cases
-                    if(newWord.startsWith(oldWord)){
-                        newInputBuffer.append(newWord);
-                        actions.add(new Tuple(Input.ACTION_INSERT, 0));
-                    }else if(newWord.endsWith(oldWord)){
-                        newInputBuffer.append(newWord);
-                        actions.add(new Tuple(Input.ACTION_INSERT, 0));
-                    }else if(oldWord.startsWith(newWord)){
-                        newInputBuffer.append(oldWord);
-                        for (int j = 0; j < oldWord.length()-newWord.length(); j++) {
-                            newInputBuffer.append("<<");
-                        }
+            for (int i = 0; i < data.length; i++){
+                if(data[i].contains("[[")){
+                    if(data[i].startsWith("[[")){
+                        newInputBuffer.append(data[i].substring(data[i].indexOf("[[") + 2, data[i].indexOf("]]")));
                         actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
-                    }else if(oldWord.endsWith(newWord)){
-                        newInputBuffer.append(oldWord.substring(0, oldWord.indexOf(newWord)));
-                        for (int j = 0; j < oldWord.length()-newWord.length(); j++) {
-                            newInputBuffer.append("<<");
+                    }else {
+                        newWord = data[i].substring(data[i].indexOf("[[") + 2, data[i].indexOf("]]"));
+
+                        if(data[i].charAt(data[i].indexOf("[[")-1) == '<' && data[i].charAt(data[i].indexOf("[[")-2) == '<'){
+                            if(i > 0)
+                                oldWord = data[i-1];
+                            else
+                                oldWord = "";
+                        }else {
+                            oldWord = substituteDeletedSuggestions(substituteDeletedChars(data[i]));
                         }
-                        newInputBuffer.append(newWord);
-                        actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
-                    }else{
-
-                        //index on the replaced word of the first different char (compared with the new word)
-                        //counting from left to right
-                        int p1 = -1;
-                        //index on the replaced word of the first different char (compared with the new word)
-                        //counting from right to left
-                        int p2 = -1;
-                        //index on the new word of the first different char (compared with the replaced)
-                        //counting from right to left
-                        int p2_2 = -1;
-
-                        int lengthDifference = Math.abs(newWord.length() - oldWord.length());
-
-                        for (int j = 0; j < oldWord.length(); j++){
-                            if(oldWord.charAt(j) != newWord.charAt(j)){
-                                p1 = j;
-                                break;
-                            }
-                        }
-                        int aux;
-                        for (int j = oldWord.length()-1; j >= 0; j--){
-                            aux = oldWord.length() < newWord.length() ? j + lengthDifference : j - lengthDifference;
-                            if(oldWord.charAt(j) != newWord.charAt(aux)){
-                                p2 = j;
-                                p2_2 = aux;
-                                break;
-                            }
-                        }
-
-                        int numberOfDeletes = Math.abs(p1 - p2) + 1;
-                        int charsDeleted = Math.abs(p2 - p1);
-
-                        if(oldWord.length() < newWord.length()){
-                            if(lengthDifference == charsDeleted){
-                                if(p1 > 0 &&
-                                        p1 < p2 &&
-                                        p1 != p2) {
-                                    newInputBuffer.append(oldWord);
-                                    for (int j = 0; j < p1; j++) {
-                                        newInputBuffer.append("<<");
-                                    }
-                                    newInputBuffer.append(newWord.substring(p1));
-                                    actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
-                                }else{
-                                    newInputBuffer.append(newWord);
-                                    actions.add(new Tuple(Input.ACTION_INSERT, 0));
-                                }
-
-                            }else{
-                                newInputBuffer.append(oldWord.substring(0, p2 + 1));//+1 bc we want to start erasing on the last different char
-                                for (int j = 0; j < numberOfDeletes; j++) {
-                                    newInputBuffer.append("<<");
-                                }
-                                newInputBuffer.append(newWord.substring(p1));
-                                actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
-                            }
-
-                        }else if(oldWord.length() > newWord.length()){
-
-                            if(p2-p1 < 0) {
-                                newInputBuffer.append(oldWord.substring(0, p1));
+                        if(newWord.equals(oldWord)) {
+                            newInputBuffer.append(data[i]);
+                        }else {
+                            //Special cases
+                            if(newWord.startsWith(oldWord)){
+                                newInputBuffer.append(newWord);
+                                actions.add(new Tuple(Input.ACTION_INSERT, 0));
+                            }else if(newWord.endsWith(oldWord)){
+                                newInputBuffer.append(newWord);
+                                actions.add(new Tuple(Input.ACTION_INSERT, 0));
+                            }else if(oldWord.startsWith(newWord)){
+                                newInputBuffer.append(oldWord);
                                 for (int j = 0; j < oldWord.length()-newWord.length(); j++) {
                                     newInputBuffer.append("<<");
                                 }
-                                newInputBuffer.append(oldWord.substring(p1));
                                 actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
-                            }else {
-                                newInputBuffer.append(oldWord.substring(0, p2 + 1));//+1 bc we want to start erasing on the last different char
-                                for (int j = 0; j < numberOfDeletes; j++) {
+                            }else if(oldWord.endsWith(newWord)){
+                                newInputBuffer.append(oldWord.substring(0, oldWord.indexOf(newWord)));
+                                for (int j = 0; j < oldWord.length()-newWord.length(); j++) {
                                     newInputBuffer.append("<<");
                                 }
-
-                                newInputBuffer.append(newWord.substring(p2_2));
+                                newInputBuffer.append(newWord);
                                 actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+                            }else{
 
-                            }
-                        }else{ //word.length() == oldWord.length()
+                                //index on the replaced word of the first different char (compared with the new word)
+                                //counting from left to right
+                                int p1 = -1;
+                                //index on the replaced word of the first different char (compared with the new word)
+                                //counting from right to left
+                                int p2 = -1;
+                                //index on the new word of the first different char (compared with the replaced)
+                                //counting from right to left
+                                int p2_2 = -1;
+
+                                int lengthDifference = Math.abs(newWord.length() - oldWord.length());
+
+                                for (int j = 0; j < oldWord.length(); j++){
+                                    if(oldWord.charAt(j) != newWord.charAt(j)){
+                                        p1 = j;
+                                        break;
+                                    }
+                                }
+                                int aux;
+                                for (int j = oldWord.length()-1; j >= 0; j--){
+                                    aux = oldWord.length() < newWord.length() ? j + lengthDifference : j - lengthDifference;
+                                    if(oldWord.charAt(j) != newWord.charAt(aux)){
+                                        p2 = j;
+                                        p2_2 = aux;
+                                        break;
+                                    }
+                                }
+
+                                int numberOfDeletes = Math.abs(p1 - p2) + 1;
+                                int charsDeleted = Math.abs(p2 - p1);
+
+                                if(oldWord.length() < newWord.length()){
+                                    if(lengthDifference == charsDeleted){
+                                        if(p1 > 0 &&
+                                                p1 < p2 &&
+                                                p1 != p2) {
+                                            newInputBuffer.append(oldWord);
+                                            for (int j = 0; j < p1; j++) {
+                                                newInputBuffer.append("<<");
+                                            }
+                                            newInputBuffer.append(newWord.substring(p1));
+                                            actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+                                        }else{
+                                            newInputBuffer.append(newWord);
+                                            actions.add(new Tuple(Input.ACTION_INSERT, 0));
+                                        }
+
+                                    }else{
+                                        newInputBuffer.append(oldWord.substring(0, p2 + 1));//+1 bc we want to start erasing on the last different char
+                                        for (int j = 0; j < numberOfDeletes; j++) {
+                                            newInputBuffer.append("<<");
+                                        }
+                                        newInputBuffer.append(newWord.substring(p1));
+                                        actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+                                    }
+
+                                }else if(oldWord.length() > newWord.length()){
+
+                                    if(p2-p1 < 0) {
+                                        newInputBuffer.append(oldWord.substring(0, p1));
+                                        for (int j = 0; j < oldWord.length()-newWord.length(); j++) {
+                                            newInputBuffer.append("<<");
+                                        }
+                                        newInputBuffer.append(oldWord.substring(p1));
+                                        actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+                                    }else {
+                                        newInputBuffer.append(oldWord.substring(0, p2 + 1));//+1 bc we want to start erasing on the last different char
+                                        for (int j = 0; j < numberOfDeletes; j++) {
+                                            newInputBuffer.append("<<");
+                                        }
+
+                                        newInputBuffer.append(newWord.substring(p2_2));
+                                        actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+
+                                    }
+                                }else{ //word.length() == oldWord.length()
 //                        if(p1 != oldWord.length()){
-                            newInputBuffer.append(oldWord.substring(0, p2 + 1));//+1 bc we want to start erasing on the last different char
-                            for (int j = 0; j < numberOfDeletes; j++) {
-                                newInputBuffer.append("<<");
-                            }
-                            newInputBuffer.append(newWord.substring(p2_2 - charsDeleted));
-                            actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+                                    newInputBuffer.append(oldWord.substring(0, p2 + 1));//+1 bc we want to start erasing on the last different char
+                                    for (int j = 0; j < numberOfDeletes; j++) {
+                                        newInputBuffer.append("<<");
+                                    }
+                                    newInputBuffer.append(newWord.substring(p2_2 - charsDeleted));
+                                    actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
 //                        }
+                                }
+                            }
                         }
                     }
+                }else {
+                    newInputBuffer.append(data[i]);
                 }
-            }else {
-                newInputBuffer.append(data[i]);
+                newInputBuffer.append(" ");
             }
-            newInputBuffer.append(" ");
-        }
-
-        if(removeSuggestionsFromInputStream)
-            return substituteDeletedSuggestions(newInputBuffer.toString().trim());
-        else
-            return newInputBuffer.toString().trim();
+            if(removeSuggestionsFromInputStream)
+                return substituteDeletedSuggestions(newInputBuffer.toString().trim());
+            else
+                return newInputBuffer.toString().trim();
 
         }catch (Exception e){
+            e.printStackTrace();
             DataBaseFacade.getInstance().write("error", "something went wrong with input buffer calculation", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
             return "";
         }
@@ -466,7 +476,7 @@ public class Logger {
             incSuggestionsSelected();
 
         addToInputBuffer("[[" + word + "]]");
-//        inputBuffer = inputBuffer + "[[" + word + "]]";
+        keys.add(new Tuple("[[" + word + "]]"+"[[autoComplete=" + !wasClicked + "]]", System.currentTimeMillis()));
 
         actions.add(new Tuple(Input.ACTION_SUGGESTION, System.currentTimeMillis()));
 
@@ -490,14 +500,16 @@ public class Logger {
         if(!LoggerController.getInstance().shouldILog() || ignoreInput)
             return;
 
-        if(character.equals("<<") && lastInputWasDeletable){
+//        if(character.equals("<<") && lastInputWasDeletable){
+        if(character.equals("<<") && getTranscribe().length() > 0){
+
             lastInputWasSpace = false;
             lastSpaceWasProgrammatic = false;
             lastInputWasDelete = true;
             if(logAction)
                 actions.add(new Tuple(Input.ACTION_DELETE, 0));
             addToInputBuffer("<<");
-//            inputBuffer = inputBuffer + "<<";
+
             wordInputBuffer = wordInputBuffer + "<<";
             if(!wordTranscribe.isEmpty())
                 wordTranscribe = wordTranscribe.substring(0, wordTranscribe.length()-1);
@@ -508,7 +520,7 @@ public class Logger {
         }else if(character.equals(" ")){
             addToInputBuffer(" ");
             setLastInputWasDeletable(true);
-//            inputBuffer = inputBuffer + " ";
+
             if(logAction)
                 actions.add(new Tuple(Input.ACTION_SPACE, 0));
 
@@ -530,7 +542,7 @@ public class Logger {
                 wordStartTS = System.currentTimeMillis();
 
             addToInputBuffer(character);
-//            inputBuffer = inputBuffer + character;
+
             wordTranscribe = wordTranscribe + character;
             wordInputBuffer = wordInputBuffer + character;
             if(logAction) {
@@ -555,14 +567,15 @@ public class Logger {
             return;
 
 
-        if(key.getCode() == CODE_DELETE && lastInputWasDeletable){
+//        if(key.getCode() == CODE_DELETE && lastInputWasDeletable){
+        if(key.getCode() == CODE_DELETE && getTranscribe().length() > 0){
 
             lastInputWasSpace = false;
             lastSpaceWasProgrammatic = false;
             lastInputWasDelete = true;
             actions.add(new Tuple(Input.ACTION_DELETE, 0));
             addToInputBuffer("<<");
-//            inputBuffer = inputBuffer + "<<";
+
             wordInputBuffer = wordInputBuffer + "<<";
             motion.add(new Tuple("DELETE", System.currentTimeMillis()));
             keys.add(new Tuple("DELETE", System.currentTimeMillis()));
@@ -581,7 +594,7 @@ public class Logger {
             addToFlightTime(eventTime, key.getCode() == CODE_DELETE);
             addTouchOffset(key, x, y, eventTime, key.getCode() == CODE_DELETE);
 
-        }else if(key.getCode() == CODE_SPACE || key.getCode() == CODE_ENTER){
+        }else if(key.getCode() == CODE_SPACE || (key.getCode() == CODE_ENTER && inputBuffer.length() > 0)){
 
             if(!lastSpaceWasProgrammatic){
                 if (willAutoCorrect) {
@@ -599,7 +612,7 @@ public class Logger {
 
 
                 addToInputBuffer(" ");
-//                inputBuffer = inputBuffer + " ";
+
                 timePerWord.add(wordFinishTS - wordStartTS);
             }
             actions.add(new Tuple(Input.ACTION_SPACE, 0));
@@ -614,6 +627,7 @@ public class Logger {
             addToFlightTime(eventTime, key.getCode() == CODE_DELETE);
             addTouchOffset(key, x, y, eventTime, key.getCode() == CODE_DELETE);
 
+
         }else if(Constants.isLetterCode(key.getCode())){
 
             if(lastInputWasSpace || inputBuffer.isEmpty())
@@ -624,7 +638,7 @@ public class Logger {
                 setLastInputWasDeletable(false);
             }else if((key.getCode() == 45) || (key.getCode() >= 65 &&  key.getCode() <= 90) || (key.getCode() >= 97 &&  key.getCode() <= 122)){
                 addToInputBuffer(Constants.printableCode(key.getCode()));
-//                inputBuffer = inputBuffer + Constants.printableCode(key.getCode());
+
                 wordTranscribe = wordTranscribe + Constants.printableCode(key.getCode());
                 wordInputBuffer = wordInputBuffer + Constants.printableCode(key.getCode());
                 actions.add(new Tuple(Input.ACTION_INSERT, 0));
@@ -707,6 +721,9 @@ public class Logger {
         if(!LoggerController.getInstance().shouldILog() || ignoreInput)
             return;
 
+        if(primaryKey.getCode() == CODE_ENTER && inputBuffer.length() == 0)
+            return;
+
         KeyEventData data = new KeyEventData(
                 primaryKey.getCode(),
                 primaryKey.getAltCode(),
@@ -715,7 +732,6 @@ public class Logger {
                 y
         );
         keys.add(new Tuple(data, System.currentTimeMillis()));
-
     }
 
     /**
@@ -730,6 +746,7 @@ public class Logger {
                     sb.insert(cc.getNewSelStart() - compositionStartIndex, cc.getInput());
                 }
             }
+
             return sb.toString();
         }catch (Exception e){
             return sb.toString();
@@ -880,6 +897,7 @@ public class Logger {
                 transcribe.append(" ");
             }
         }catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
             transcribe = new StringBuilder("substituteDeletedSuggestions: something_went_wrong");
         }
         return transcribe.toString().trim();
@@ -911,6 +929,7 @@ public class Logger {
     }
 
     private void addToInputBuffer(String string){
+
         if(MetricsController.getInstance().mode == StudyConstants.IMPLICIT_MODE){
             if(discardedChars > 0){
                 if(string.contains("[[") && string.contains("]]"))
@@ -944,8 +963,13 @@ public class Logger {
 
     public void addCursorChange(CursorChange cursorChange){
 
-        if(!wasEditTextEmpty)
+        if(!wasEditTextEmpty) {
+            keys.add(new Tuple(cursorChange.toString() + "-ignored", System.currentTimeMillis()));
             return;
+        }
+
+        incCursorMoves();
+        keys.add(new Tuple(cursorChange.toString(), System.currentTimeMillis()));
 
         if(cursorChange.getNewSelStart() < compositionStartIndex){
             ignoreInput = true;
