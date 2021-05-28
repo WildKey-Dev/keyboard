@@ -69,7 +69,7 @@ public class CompositionActivity extends Activity {
             //and update the string on the button
             //and record the TimeStamp
             this.index = (int) phrasesAlreadySaved;
-            if(this.index != 0) {
+            if(this.index > 0 && this.index < phrases.length) {
                 ((Button) findViewById(R.id.bt_start)).setText(R.string.str_continue);
                 recordEndPauseTS = true;
             }else if(this.index == phrases.length){
