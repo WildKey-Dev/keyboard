@@ -8,12 +8,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
 import pt.lasige.inputmethod.latin.R;
-import pt.lasige.inputmethod.study.PromptLauncherActivity;
+import pt.lasige.inputmethod.latin.settings.SettingsLauncherActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -36,7 +35,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void sendNotification(Context context, String messageBody, String title, int id) {
-        Intent pra = new Intent(context, PromptLauncherActivity.class);
+        Intent pra = new Intent(context, SettingsLauncherActivity.class);
         PendingIntent pi = PendingIntent.getActivity(context, 0, pra, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build notification based on Intent
