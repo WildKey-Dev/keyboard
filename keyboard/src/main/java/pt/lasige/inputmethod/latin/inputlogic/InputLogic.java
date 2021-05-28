@@ -58,6 +58,7 @@ import pt.lasige.inputmethod.latin.utils.InputTypeUtils;
 import pt.lasige.inputmethod.latin.utils.RecapitalizeStatus;
 import pt.lasige.inputmethod.latin.utils.StatsUtils;
 import pt.lasige.inputmethod.latin.utils.TextRange;
+import pt.lasige.inputmethod.logger.DataBaseFacade;
 import pt.lasige.inputmethod.logger.Logger;
 import pt.lasige.inputmethod.logger.LoggerController;
 import pt.lasige.inputmethod.logger.data.CursorChange;
@@ -415,7 +416,13 @@ public final class InputLogic {
                     newSelStart, newSelEnd, false /* shouldFinishComposition */);
         }
 
-        LoggerController.getInstance().getLogger().addCursorChange(new CursorChange(oldSelStart, oldSelEnd, newSelStart, newSelEnd, System.currentTimeMillis()));
+
+        try{
+            LoggerController.getInstance().getLogger().addCursorChange(new CursorChange(oldSelStart, oldSelEnd, newSelStart, newSelEnd, mConnection.getmComposingText().length(), System.currentTimeMillis()));
+        }catch (Exception e){
+            e.printStackTrace();
+            DataBaseFacade.getInstance().write("error", "something went wrong with cursor change: " + e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+        }
 
         // The cursor has been moved : we now accept to perform recapitalization
         mRecapitalizeStatus.enable();

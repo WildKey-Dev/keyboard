@@ -1,19 +1,20 @@
 package pt.lasige.inputmethod.logger.data;
 
 public class CursorChange {
-    int oldSelStart, oldSelEnd, newSelStart, newSelEnd;
+    int oldSelStart, oldSelEnd, newSelStart, newSelEnd, editTextLen;
     long timeStamp;
     String input = "";
 
     public CursorChange() {
     }
 
-    public CursorChange(int oldSelStart, int oldSelEnd, int newSelStart, int newSelEnd, long timeStamp) {
+    public CursorChange(int oldSelStart, int oldSelEnd, int newSelStart, int newSelEnd, int editTextLen, long timeStamp) {
         this.oldSelStart = oldSelStart;
         this.oldSelEnd = oldSelEnd;
         this.newSelStart = newSelStart;
         this.newSelEnd = newSelEnd;
         this.timeStamp = timeStamp;
+        this.editTextLen = editTextLen;
     }
 
     public int getOldSelStart() {
@@ -68,6 +69,14 @@ public class CursorChange {
         this.timeStamp = timeStamp;
     }
 
+    public int getEditTextLen() {
+        return editTextLen;
+    }
+
+    public void setEditTextLen(int editTextLen) {
+        this.editTextLen = editTextLen;
+    }
+
     @Override
     public String toString() {
         return "CursorChange{" +
@@ -75,6 +84,7 @@ public class CursorChange {
                 ", oldSelEnd=" + oldSelEnd +
                 ", newSelStart=" + newSelStart +
                 ", newSelEnd=" + newSelEnd +
+                ", editTextLen=" + editTextLen +
                 ", timeStamp=" + timeStamp +
                 ", input='" + input + '\'' +
                 '}';

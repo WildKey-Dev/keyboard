@@ -157,7 +157,7 @@ public final class RichInputConnection implements PrivateCommandPerformer {
         mLastSlowInputConnectionTime = -SLOW_INPUTCONNECTION_PERSIST_MS;
     }
 
-    private void checkConsistencyForDebug() {
+    public void checkConsistencyForDebug() {
         final ExtractedTextRequest r = new ExtractedTextRequest();
         r.hintMaxChars = 0;
         r.hintMaxLines = 0;
@@ -176,6 +176,7 @@ public final class RichInputConnection implements PrivateCommandPerformer {
         final String reference = (beforeCursor.length() <= actualLength) ? beforeCursor.toString()
                 : beforeCursor.subSequence(beforeCursor.length() - actualLength,
                         beforeCursor.length()).toString();
+
         if (et.selectionStart != mExpectedSelStart
                 || !(reference.equals(internal.toString()))) {
             final String context = "Expected selection start = " + mExpectedSelStart
@@ -1029,5 +1030,16 @@ public final class RichInputConnection implements PrivateCommandPerformer {
         }
         return InputConnectionCompatUtils.requestCursorUpdates(
                 mIC, enableMonitor, requestImmediateCallback);
+    }
+
+    public String getmComposingText() {
+        final ExtractedTextRequest r = new ExtractedTextRequest();
+        r.hintMaxChars = 0;
+        r.hintMaxLines = 0;
+        r.token = 1;
+        r.flags = 0;
+
+        ExtractedText et = mIC.getExtractedText(r, 0);
+        return et.text.toString();
     }
 }

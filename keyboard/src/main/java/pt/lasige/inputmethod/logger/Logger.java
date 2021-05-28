@@ -39,10 +39,10 @@ public class Logger {
     private long downTS, wordStartTS, wordFinishTS, outPhraseTS = -1;
     private float tMajor = -1, tMinor = -1;
     private boolean isEventRunning = false, lastInputWasDelete = false, lastInputWasSpace = false,
-            lastSpaceWasProgrammatic = false, willAutoCorrect = false, autoCorrected = false,
-            lastInputWasDeletable = false;
+            lastInputWasSuggestion = false, lastSpaceWasProgrammatic = false, willAutoCorrect = false,
+            autoCorrected = false, lastInputWasDeletable = false;
     private final boolean onlyCountFirstSubstitutionForEachWord = false;
-    private boolean isCursorOnEnd = true, ignoreInput = false, wasEditTextEmpty = true;
+    private boolean isCursorOnEnd = true, wasCursorChanged = false, ignoreInput = false, wasEditTextEmpty = true;
     private int numbers = 0, specialChars = 0, suggestionsSelected = 0, autoCorrection = 0,
             voiceInput = 0, cursorMoves = 0, compositionStartIndex = 0, discardedChars = 0;
     private final ArrayList<CursorChange> cursorChanges = new ArrayList<>();
@@ -218,24 +218,37 @@ public class Logger {
             trimActionsArray();
             StringBuilder newInputBuffer = new StringBuilder();
             String newWord, oldWord;
-            String[] data = splitBuffer(fixBuffer(consolidateBuffer(inputBuffer)));
+            String[] data = splitBuffer(fixBuffer(consolidateBufferNew(inputBuffer)));
 
             for (int i = 0; i < data.length; i++){
+
                 if(data[i].contains("[[")){
                     if(data[i].startsWith("[[")){
-                        newInputBuffer.append(data[i].substring(data[i].indexOf("[[") + 2, data[i].indexOf("]]")));
+                        newInputBuffer.append(data[i].substring(data[i].lastIndexOf("[[") + 2, data[i].lastIndexOf("]]")));
                         actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
-                    }else {
-                        newWord = data[i].substring(data[i].indexOf("[[") + 2, data[i].indexOf("]]"));
 
-                        if(data[i].charAt(data[i].indexOf("[[")-1) == '<' && data[i].charAt(data[i].indexOf("[[")-2) == '<'){
+                    }else {
+                        newWord = data[i].substring(data[i].lastIndexOf("[[") + 2, data[i].lastIndexOf("]]"));
+                        //if the user deletes the space and then uses a suggestion
+                        if(data[i].startsWith("<<") && data[i].charAt(data[i].indexOf("[[")-1) == '<' && data[i].charAt(data[i].indexOf("[[")-2) == '<'){
                             if(i > 0)
                                 oldWord = data[i-1];
                             else
                                 oldWord = "";
+
+                            //remove last space
+                            newInputBuffer.deleteCharAt(newInputBuffer.toString().length() - 1);
+
+                            if(newInputBuffer.toString().lastIndexOf(" ") == -1){
+                                newInputBuffer.setLength(0);
+                            }else {
+                                newInputBuffer.setLength(newInputBuffer.toString().lastIndexOf(" ") + 1);
+                            }
+
                         }else {
-                            oldWord = substituteDeletedSuggestions(substituteDeletedChars(data[i]));
+                            oldWord = substituteDeletedChars(substituteDeletedSuggestions(data[i]));
                         }
+
                         if(newWord.equals(oldWord)) {
                             newInputBuffer.append(data[i]);
                         }else {
@@ -243,15 +256,18 @@ public class Logger {
                             if(newWord.startsWith(oldWord)){
                                 newInputBuffer.append(newWord);
                                 actions.add(new Tuple(Input.ACTION_INSERT, 0));
+
                             }else if(newWord.endsWith(oldWord)){
                                 newInputBuffer.append(newWord);
                                 actions.add(new Tuple(Input.ACTION_INSERT, 0));
+
                             }else if(oldWord.startsWith(newWord)){
                                 newInputBuffer.append(oldWord);
                                 for (int j = 0; j < oldWord.length()-newWord.length(); j++) {
                                     newInputBuffer.append("<<");
                                 }
                                 actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+
                             }else if(oldWord.endsWith(newWord)){
                                 newInputBuffer.append(oldWord.substring(0, oldWord.indexOf(newWord)));
                                 for (int j = 0; j < oldWord.length()-newWord.length(); j++) {
@@ -259,6 +275,7 @@ public class Logger {
                                 }
                                 newInputBuffer.append(newWord);
                                 actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+
                             }else{
 
                                 //index on the replaced word of the first different char (compared with the new word)
@@ -303,9 +320,11 @@ public class Logger {
                                             }
                                             newInputBuffer.append(newWord.substring(p1));
                                             actions.add(new Tuple(Input.ACTION_SUBSTITUTION, 0));
+
                                         }else{
                                             newInputBuffer.append(newWord);
                                             actions.add(new Tuple(Input.ACTION_INSERT, 0));
+
                                         }
 
                                     }else{
@@ -354,6 +373,7 @@ public class Logger {
                 }
                 newInputBuffer.append(" ");
             }
+
             if(removeSuggestionsFromInputStream)
                 return substituteDeletedSuggestions(newInputBuffer.toString().trim());
             else
@@ -364,6 +384,10 @@ public class Logger {
             DataBaseFacade.getInstance().write("error", "something went wrong with input buffer calculation", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
             return "";
         }
+    }
+
+    public String getConsolidatedInputStream(){
+        return consolidateBufferNew(inputBuffer);
     }
 
     public String getTargetPhrase(){
@@ -475,13 +499,18 @@ public class Logger {
         if (wasClicked)
             incSuggestionsSelected();
 
+        if (lastInputWasSuggestion)
+            writeToBuffer(" ", true);
+
         addToInputBuffer("[[" + word + "]]");
         keys.add(new Tuple("[[" + word + "]]"+"[[autoComplete=" + !wasClicked + "]]", System.currentTimeMillis()));
 
         actions.add(new Tuple(Input.ACTION_SUGGESTION, System.currentTimeMillis()));
 
-        if(addSpace)
-            writeToBuffer(" ", true);
+//        if(addSpace)
+//            writeToBuffer(" ", true);
+
+        lastInputWasSuggestion = addSpace;
     }
 
     public void addSuggestionList(SuggestedWords list){
@@ -506,6 +535,7 @@ public class Logger {
             lastInputWasSpace = false;
             lastSpaceWasProgrammatic = false;
             lastInputWasDelete = true;
+            lastInputWasSuggestion = false;
             if(logAction)
                 actions.add(new Tuple(Input.ACTION_DELETE, 0));
             addToInputBuffer("<<");
@@ -530,6 +560,7 @@ public class Logger {
             lastInputWasSpace = true;
             lastSpaceWasProgrammatic = true;
             lastInputWasDelete = false;
+            lastInputWasSuggestion = false;
 
             if (willAutoCorrect) {
                 incAutoCorrection();
@@ -540,6 +571,10 @@ public class Logger {
         }else{
             if(lastInputWasSpace || inputBuffer.isEmpty())
                 wordStartTS = System.currentTimeMillis();
+
+            if (lastInputWasSuggestion)
+                writeToBuffer(" ", true);
+
 
             addToInputBuffer(character);
 
@@ -556,6 +591,7 @@ public class Logger {
             lastInputWasSpace = false;
             lastSpaceWasProgrammatic = false;
             lastInputWasDelete = false;
+            lastInputWasSuggestion = false;
             setAutoCorrected(false);
             setLastInputWasDeletable(true);
         }
@@ -573,6 +609,7 @@ public class Logger {
             lastInputWasSpace = false;
             lastSpaceWasProgrammatic = false;
             lastInputWasDelete = true;
+            lastInputWasSuggestion = false;
             actions.add(new Tuple(Input.ACTION_DELETE, 0));
             addToInputBuffer("<<");
 
@@ -622,6 +659,7 @@ public class Logger {
             lastInputWasSpace = true;
             lastSpaceWasProgrammatic = false;
             lastInputWasDelete = false;
+            lastInputWasSuggestion = false;
             setLastInputWasDeletable(true);
 
             addToFlightTime(eventTime, key.getCode() == CODE_DELETE);
@@ -632,6 +670,9 @@ public class Logger {
 
             if(lastInputWasSpace || inputBuffer.isEmpty())
                 wordStartTS = System.currentTimeMillis();
+
+            if (lastInputWasSuggestion)
+                writeToBuffer(" ", true);
 
             if(key.getCode() >= 48 &&  key.getCode() <= 57){
                 incNumbers();
@@ -655,6 +696,7 @@ public class Logger {
             lastInputWasSpace = false;
             lastSpaceWasProgrammatic = false;
             lastInputWasDelete = false;
+            lastInputWasSuggestion = false;
             setAutoCorrected(false);
 
             addToFlightTime(eventTime, key.getCode() == CODE_DELETE);
@@ -737,6 +779,7 @@ public class Logger {
     /**
      * UTILS
      **/
+    @Deprecated
     private String consolidateBuffer(String inputBuffer) {
 
         StringBuilder sb = new StringBuilder(inputBuffer);
@@ -753,7 +796,252 @@ public class Logger {
         }
     }
 
+    private String consolidateBufferNew(String inputBuffer) {
+
+        StringBuilder sb;
+        String auxBuffer = inputBuffer;
+        int real;
+        int full;
+        int deleteCount;
+        boolean lastDelete, isInsideSuggestion, wasInsideSuggestion, inputIsSuggestion,
+                lastEndBracket, lastStartBracket, wasInsideLoop, containsSuggestion;
+        try {
+
+            for (CursorChange cc : cursorChanges) {
+                if (!cc.getInput().isEmpty()) {
+                    real = cc.getEditTextLen();
+                    full = auxBuffer.length() - 1;
+                    sb = new StringBuilder(auxBuffer);
+                    deleteCount = 0;
+                    lastDelete = false;
+                    lastEndBracket = false;
+                    lastStartBracket = false;
+                    wasInsideSuggestion = false;
+                    isInsideSuggestion = false;
+                    inputIsSuggestion = cc.getInput().startsWith("[[") && cc.getInput().endsWith("]]");
+                    containsSuggestion = cc.getInput().contains("[[") && cc.getInput().contains("]]");
+                    wasInsideLoop = false;
+
+                    while(real > cc.getNewSelStart()){
+                        wasInsideLoop = true;
+
+                        if(auxBuffer.charAt(full) == '<'){
+                            if (lastDelete){
+                                deleteCount++;
+                                lastDelete = false;
+                            }else {
+                                lastDelete = true;
+                            }
+
+                        }else if(auxBuffer.charAt(full) == ']'){
+                            if (lastEndBracket){
+                                lastEndBracket = false;
+                                isInsideSuggestion = true;
+                            }else {
+                                lastEndBracket = true;
+                            }
+                            wasInsideSuggestion = false;
+                        }else if(auxBuffer.charAt(full) == '['){
+                            if (lastStartBracket){
+                                wasInsideSuggestion = true;
+                                isInsideSuggestion = false;
+                                lastStartBracket = false;
+                            }else {
+                                lastStartBracket = true;
+                                wasInsideSuggestion = false;
+                            }
+                        }else {
+                            if(wasInsideSuggestion){//ignore counting index after a suggestion bc we are interesting on text inside the suggestion and not he replaced text
+                                if(auxBuffer.charAt(full) == ' '){// reset inside suggestion
+                                    wasInsideSuggestion = false;
+                                    if(deleteCount > 0)
+                                        deleteCount--;
+                                    else
+                                        real--;
+                                }else {} // only ignore letters
+                            }else {
+                                if(deleteCount > 0)
+                                    deleteCount--;
+                                else
+                                    real--;
+                            }
+                        }
+                        full--;
+
+                    }
+
+                    // if we didn't go inside the loop
+                    if(!wasInsideLoop){
+                        // and the buffer does not end in a special char
+                        // we want the cursor on the end
+//                        if(!auxBuffer.endsWith("]") && !auxBuffer.endsWith("<"))
+//                            full++;
+
+                        // and the buffer ends with a special char
+                        // we want the cursor inside the suggestion
+                        if(auxBuffer.endsWith("<") || auxBuffer.endsWith("]")){
+                            while(full > 0){
+                                if (auxBuffer.charAt(full) != ']' && auxBuffer.charAt(full) != '<')
+                                    break;
+
+                                full--;
+                            }
+
+//                            full++; //we want to write after the last suggestion char and not before
+                        }
+                    }
+                    //consume the remain deletes
+                    if (full < auxBuffer.length() && auxBuffer.charAt(full) == '<') {
+                        full = getNextWritableIndexAfterDeletes(full, auxBuffer);
+                    }
+
+                    //if the input of the cursor change is only a suggestion
+                    //means that the user changed the cursor inside a word and accepted a
+                    //suggestion to that word so we want to put it at next space
+                    //this is sug[[suggestion]]
+                    //                  ^
+                    //                  |
+                    //              ended here
+                    //
+                    //scenario 1
+                    //this is suggestion
+                    //                  ^
+                    //                  |
+                    //      go here and add the suggestion before the space
+                    //scenario 2
+                    //this is sug[[suggestion]]
+                    //                         ^
+                    //                         |
+                    //         go here and add the suggestion before the space
+                    if(inputIsSuggestion) {
+                        sb.insert(getNextSpaceFW(full, auxBuffer), cc.getInput());
+                    }else if(containsSuggestion){
+                        sb.insert(full, cc.getInput().substring(0, cc.getInput().indexOf("[[")));
+                        sb.insert(getNextSpaceFW(full, sb.toString()), cc.getInput().substring(cc.getInput().indexOf("[["), cc.getInput().length()));
+                    //if we end on a char next to a suggestion we want to skip the text until the
+                    //next space and write after the space
+                    //this is sug[[suggestion]]
+                    //             ^
+                    //             |
+                    //         ended here
+                    //
+                    //this is sug[[suggestion]]
+                    //        ^ ^
+                    //        | |
+                    //      skip this
+                    //this is sug[[suggestion]]
+                    //       ^
+                    //       |
+                    //     go here and add the text after the space
+                    } else if(auxBuffer.charAt(full - 1) == '[' && auxBuffer.charAt(full) != '[') {
+                        sb.insert(getNextSpaceBW(full - 1, auxBuffer) + 1, cc.getInput());
+                        //if we end on the char that represents the suggestion we also want to skip the
+                        //text until the next space but write before the space
+                        //this is sug[[suggestion]]
+                        //           ^^
+                        //           ||
+                        //     ended here or here
+                        //
+                        //this is sug[[suggestion]]
+                        //        ^ ^
+                        //        | |
+                        //      skip this
+                        //this is sug[[suggestion]]
+                        //       ^
+                        //       |
+                        //     go here and add the text before the space
+                    }else if (full < auxBuffer.length() && auxBuffer.charAt(full) == '[') {
+                        sb.insert(getNextSpaceBW(full, auxBuffer), cc.getInput());// we want to write before the space
+                    }else if(full < auxBuffer.length() && auxBuffer.charAt(full) == ']' && auxBuffer.charAt(full-1) != ']'){
+                        sb.insert(full, cc.getInput());
+                    }else if (full < auxBuffer.length() && auxBuffer.charAt(full) == ']') {
+                        sb.insert(full-2, cc.getInput());// we want to write before the space
+                    }else {
+                        sb.insert(full+1, cc.getInput());
+                    }
+
+                    auxBuffer = sb.toString();
+
+                }
+            }
+
+            return auxBuffer;
+        }catch (Exception e){
+            e.printStackTrace();
+            return auxBuffer;
+        }
+    }
+
+    /**
+     * Find the next space on the buffer, the search is backwards
+     * @param startIndex the index to start searching
+     * @param buffer the buffer to search
+     * @requires startIndex < buffer.len - 1
+     * @return the index of the next space or zero
+     */
+    private int getNextSpaceBW(int startIndex, String buffer){
+        while (startIndex >= 0){
+            if (buffer.charAt(startIndex) == ' ')
+                return startIndex;
+
+            startIndex--;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Find the next space on the buffer, the search is forward
+     * @param startIndex the index to start searching
+     * @param buffer the buffer to search
+     * @requires startIndex >= 0
+     * @return the index of the next space or the index of the last char of the buffer
+     */
+    private int getNextSpaceFW(int startIndex, String buffer){
+        while (startIndex < buffer.length()){
+            if (buffer.charAt(startIndex) == ' ')
+                return startIndex;
+
+            startIndex++;
+        }
+
+        return buffer.length();
+    }
+
+    /**
+     * Find the next writable index after accounting for the deletes, backwards searching
+     * @param startIndex the index to start searching
+     * @param buffer the buffer to search
+     * @requires startIndex < buffer.len - 1
+     * @return the index of the next space or the index of the last char of the buffer
+     */
+    private int getNextWritableIndexAfterDeletes(int startIndex, String buffer){
+        int deleteCount = 0;
+        boolean lastDelete = false;
+        while (startIndex >= 0){
+            if(buffer.charAt(startIndex) == '<'){
+                if (lastDelete){
+                    deleteCount++;
+                    lastDelete = false;
+                }else {
+                    lastDelete = true;
+                }
+            }else {
+                if (deleteCount == 0) {
+                    return startIndex + 1;
+                }else {
+                    deleteCount--;
+                }
+            }
+
+            startIndex--;
+        }
+
+        return 0;
+    }
+
     private String[] splitBuffer(String inputBuffer){
+
         String[] splitBuffer = inputBuffer.split(" ");
         ArrayList<String> dataAux = new ArrayList<>();
         for (int i = 0; i < splitBuffer.length; i++){
@@ -769,46 +1057,47 @@ public class Logger {
 
     private String fixBuffer(String inputBuffer) {
 
-        if(inputBuffer.contains("<<[[")){
-            int suggestionsOnARow = 0, lastLetterIndex = 0, startSuggestionIndex = 0, endSuggestionIndex = 0, lastStartSuggestionIndex = 0;
-            boolean lastWasDelete = false, onSuggestion = false, lastWasSuggestion = false;
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < inputBuffer.length(); i++) {
-                if (onSuggestion) {
-                    if (inputBuffer.charAt(i) == ']' && inputBuffer.charAt(i - 1) == ']') {
-                        onSuggestion = false;
-                        endSuggestionIndex = i+1;
-                        suggestionsOnARow++;
-                    }
-
-                    if(lastWasDelete && !onSuggestion){
-                        try{
-                            sb.insert(lastLetterIndex, inputBuffer,
-                                    startSuggestionIndex,
-                                    endSuggestionIndex);
-                        }catch (Exception e){
-                            DataBaseFacade.getInstance().write("discarded", "error calculating input buffer", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
-                        }
-
-                    }
-                } else {
-                    if (inputBuffer.charAt(i) == '[' && inputBuffer.charAt(i + 1) == '[') {
-                        onSuggestion = true;
-                        startSuggestionIndex = i;
-                    } else if (inputBuffer.charAt(i) != '[' && inputBuffer.charAt(i) != ']' && inputBuffer.charAt(i) != ' ' && inputBuffer.charAt(i) != '<') {
-                        lastLetterIndex = i + 1;
-                        sb.append(inputBuffer.charAt(i));
-                        suggestionsOnARow = 0;
-                    }else {
-                        sb.append(inputBuffer.charAt(i));
-                        lastWasDelete = inputBuffer.charAt(i) == '<';
-                    }
-                }
-            }
-            return sb.toString();
-        }else {
-            return inputBuffer;
-        }
+        return inputBuffer;
+//        if(inputBuffer.contains("<<[[")){
+//            int suggestionsOnARow = 0, lastLetterIndex = 0, startSuggestionIndex = 0, endSuggestionIndex = 0, lastStartSuggestionIndex = 0;
+//            boolean lastWasDelete = false, onSuggestion = false, lastWasSuggestion = false;
+//            StringBuilder sb = new StringBuilder();
+//            for (int i = 0; i < inputBuffer.length(); i++) {
+//                if (onSuggestion) {
+//                    if (inputBuffer.charAt(i) == ']' && inputBuffer.charAt(i - 1) == ']') {
+//                        onSuggestion = false;
+//                        endSuggestionIndex = i+1;
+//                        suggestionsOnARow++;
+//                    }
+//
+//                    if(lastWasDelete && !onSuggestion){
+//                        try{
+//                            sb.insert(lastLetterIndex, inputBuffer,
+//                                    startSuggestionIndex,
+//                                    endSuggestionIndex);
+//                        }catch (Exception e){
+//                            DataBaseFacade.getInstance().write("discarded", "error calculating input buffer", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+//                        }
+//
+//                    }
+//                } else {
+//                    if (inputBuffer.charAt(i) == '[' && inputBuffer.charAt(i + 1) == '[') {
+//                        onSuggestion = true;
+//                        startSuggestionIndex = i;
+//                    } else if (inputBuffer.charAt(i) != '[' && inputBuffer.charAt(i) != ']' && inputBuffer.charAt(i) != ' ' && inputBuffer.charAt(i) != '<') {
+//                        lastLetterIndex = i + 1;
+//                        sb.append(inputBuffer.charAt(i));
+//                        suggestionsOnARow = 0;
+//                    }else {
+//                        sb.append(inputBuffer.charAt(i));
+//                        lastWasDelete = inputBuffer.charAt(i) == '<';
+//                    }
+//                }
+//            }
+//            return sb.toString();
+//        }else {
+//            return inputBuffer;
+//        }
     }
 
     public void removeLastSuggestionFromInput(){
@@ -938,20 +1227,24 @@ public class Logger {
                     discardedChars += string.length();
                 return;
             }
-            if(!isCursorOnEnd) {
-                if(string.contains("[[") && string.contains("]]")){
-                    discardedChars += string.length()-4;
-                    MetricsController.getInstance().runMetricCalculation(LoggerController.getInstance().getLogger(), null, String.valueOf(System.currentTimeMillis()), "implicit_mode", 0);
-                }else {
-                    inputTimeStamps.add(System.currentTimeMillis());
-                    cursorChanges.get(cursorChanges.size() - 1).addToInput(string);
-                }
+            if(wasCursorChanged) {
+//            if(!isCursorOnEnd) {
+//                if(string.contains("[[") && string.contains("]]")){
+//                    discardedChars += string.length()-4;
+//                    MetricsController.getInstance().runMetricCalculation(LoggerController.getInstance().getLogger(), null, String.valueOf(System.currentTimeMillis()), "implicit_mode", 0);
+//                }else {
+//                    inputTimeStamps.add(System.currentTimeMillis());
+//                    cursorChanges.get(cursorChanges.size() - 1).addToInput(string);
+//                }
+                inputTimeStamps.add(System.currentTimeMillis());
+                cursorChanges.get(cursorChanges.size() - 1).addToInput(string);
             }else {
                 inputTimeStamps.add(System.currentTimeMillis());
                 inputBuffer = inputBuffer + string;
             }
         }else {
-            if(!isCursorOnEnd) {
+//            if(!isCursorOnEnd) {
+            if(wasCursorChanged){
                 inputTimeStamps.add(System.currentTimeMillis());
                 cursorChanges.get(cursorChanges.size() - 1).addToInput(string);
             }else {
@@ -962,6 +1255,11 @@ public class Logger {
     }
 
     public void addCursorChange(CursorChange cursorChange){
+
+        if(cursorChange.getEditTextLen() == 0)//ignore cursor changes when the editText is empty
+            return;
+
+        lastInputWasSuggestion = false;
 
         if(!wasEditTextEmpty) {
             keys.add(new Tuple(cursorChange.toString() + "-ignored", System.currentTimeMillis()));
@@ -981,13 +1279,15 @@ public class Logger {
             ignoreInput = false;
         }
 
-        int transcribeLength = getTranscribe().length();
 
-        if (inputBuffer.length() > 0 && inputBuffer.charAt(inputBuffer.length()-1) == ' ')
-            transcribeLength ++;
+//        int transcribeLength = getTranscribe().length();
+//
+//        if (inputBuffer.length() > 0 && inputBuffer.charAt(inputBuffer.length()-1) == ' ')
+//            transcribeLength ++;
+//
+//        isCursorOnEnd = transcribeLength == (cursorChange.getNewSelStart() - compositionStartIndex);
 
-        isCursorOnEnd = transcribeLength == (cursorChange.getNewSelStart() - compositionStartIndex);
-
+        wasCursorChanged = true;
         cursorChanges.add(cursorChange);
     }
 

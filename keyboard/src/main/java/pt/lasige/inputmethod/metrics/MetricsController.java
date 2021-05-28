@@ -321,6 +321,11 @@ public class MetricsController {
         if(mode == StudyConstants.IMPLICIT_MODE){
         }else if(mode == StudyConstants.TRANSCRIPTION_MODE || mode == StudyConstants.COMPOSITION_MODE){
             try {
+                DataBaseFacade.getInstance().write("input-stream-consolidated", log.getConsolidatedInputStream(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }catch (Exception e){
+                DataBaseFacade.getInstance().write("input-stream-consolidated", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            }
+            try {
                 DataBaseFacade.getInstance().write("input-stream-og", log.getOriginalInputBuffer(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }catch (Exception e){
                 DataBaseFacade.getInstance().write("input-stream-og", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
@@ -420,6 +425,7 @@ public class MetricsController {
     }
 
     public void runMetricCalculation(final Logger log, final String targetPhrase, String questionID, String studyID, int phraseNumber){
+
 
         if(targetPhrase != null){
             //calculate one time with the target phrase
