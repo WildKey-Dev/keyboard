@@ -17,16 +17,17 @@
 package pt.lasige.inputmethod.latin.setup;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -35,8 +36,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -45,6 +48,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
 import pt.lasige.inputmethod.compat.TextViewCompatUtils;
 import pt.lasige.inputmethod.compat.ViewCompatUtils;
@@ -87,14 +91,17 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
     private int mStepNumber;
     private boolean mNeedsToAdjustStepNumberToSystemState;
     private static final int STEP_WELCOME = 0;
-    private static final int STEP_1 = 1;
-    private static final int STEP_2 = 2;
-    private static final int STEP_3 = 3;
-    private static final int STEP_LAUNCHING_IME_SETTINGS = 4;
-    private static final int STEP_BACK_FROM_IME_SETTINGS = 5;
+    private static final int STEP_0 = 1;
+    private static final int STEP_1 = 2;
+    private static final int STEP_2 = 3;
+    private static final int STEP_3 = 4;
+    private static final int STEP_LAUNCHING_IME_SETTINGS = 5;
+    private static final int STEP_BACK_FROM_IME_SETTINGS = 6;
+
+    private boolean validConfig = false;
 
     private SettingsPoolingHandler mHandler;
-
+    private FirebaseAuth mAuth;
     private static final class SettingsPoolingHandler
             extends LeakGuardHandlerWrapper<SetupWizardActivity> {
         private static final int MSG_POLLING_IME_SETTINGS = 0;
@@ -176,38 +183,56 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
         setTheme(android.R.style.Theme_Translucent_NoTitleBar);
         super.onCreate(savedInstanceState);
 
-        if(SHOW_EMAIL_DIALOG){
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("Save email on DB?")
-                    .setMessage("only for debug, if needed")
-                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            SAVE_EMAIL = true;
-                            startGoogleLogin();
-                        }
+//        AlertDialog dialog = new AlertDialog.Builder(this)
+//                .setTitle("Login method")
+//                .setMessage("Choose login method")
+//                .setPositiveButton("Google", (dialog1, which) -> {
+//                    startGoogleLogin();
+//                })
+//                .setNegativeButton("Anónimo", (dialog12, which) -> {
+//                    startAnonymousLogin();
+//                }).create();
+//
+//        dialog.setOnShowListener(arg0 -> {
+//            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.study_accent_color));
+//            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.study_accent_color));
+//        });
 
-                    })
-                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            SAVE_EMAIL = false;
-                            startGoogleLogin();
-                        }
+//        dialog.show();
 
-                    }).create();
-
-            dialog.setOnShowListener(arg0 -> {
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.study_accent_color));
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.study_accent_color));
-            });
-
-            dialog.show();
-        }else {
-            startGoogleLogin();
-        }
+//        if(SHOW_EMAIL_DIALOG){
+//            AlertDialog dialog = new AlertDialog.Builder(this)
+//                    .setTitle("Save email on DB?")
+//                    .setMessage("only for debug, if needed")
+//                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
+//                    {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            SAVE_EMAIL = true;
+//                            startGoogleLogin();
+//                        }
+//
+//                    })
+//                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
+//                    {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            SAVE_EMAIL = false;
+//                            startGoogleLogin();
+//                        }
+//
+//                    }).create();
+//
+//            dialog.setOnShowListener(arg0 -> {
+//                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.study_accent_color));
+//                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.study_accent_color));
+//            });
+//
+//            dialog.show();
+//        }else {
+//            startGoogleLogin();
+//            startAnonymousLogin();
+//        }
 
         mImm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
         mHandler = new SettingsPoolingHandler(this, mImm);
@@ -233,6 +258,14 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
         final SetupStepIndicatorView indicatorView =
                 (SetupStepIndicatorView)findViewById(R.id.setup_step_indicator);
         mSetupStepGroup = new SetupStepGroup(indicatorView);
+
+        final SetupStep step0 = new SetupStep(STEP_0, applicationName,
+                (TextView)findViewById(R.id.setup_step0_bullet), findViewById(R.id.setup_step0),
+                R.string.setup_step0_title, R.string.setup_step0_instruction,
+                0 /* finishedInstruction */, 0,
+                R.string.setup_step0_action);
+        step0.setLogInAction(this::logIn);
+        mSetupStepGroup.addStep(step0);
 
         mStep1Bullet = (TextView)findViewById(R.id.setup_step1_bullet);
         mStep1Bullet.setOnClickListener(this);
@@ -345,7 +378,7 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
         final int currentStep = determineSetupStepNumber();
         final int nextStep;
         if (v == mActionStart) {
-            nextStep = STEP_1;
+            nextStep = STEP_0;
         } else if (v == mActionNext) {
             nextStep = mStepNumber + 1;
         } else if (v == mStep1Bullet && currentStep == STEP_2) {
@@ -407,9 +440,49 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
         startActivity(intent);
     }
 
+    void logIn(String userID, String configID) {
+
+        checkIfConfigExists(userID, configID);
+
+        mStepNumber = determineSetupStepNumber();
+        updateSetupStepView();
+    }
+
+    boolean isLogIn(){
+
+        return validConfig;
+    }
+
+    void checkIfConfigExists(String userID, String configID){
+        Log.d(TAG, "checkIfConfigExists: configID " + configID);
+        Log.d(TAG, "checkIfConfigExists: userID " + userID);
+        ProgressDialog pd = new ProgressDialog(SetupWizardActivity.this);
+        pd.setMessage("Checking if config exists...");
+        pd.show();
+
+        DataBaseFacade.getInstance().checkIfConfigExists(getApplicationContext(), configID, result -> {
+            validConfig = result;
+            pd.dismiss();
+            if (validConfig){
+                Log.d(TAG, "logIn:");
+                Log.d(TAG, "logIn: userID   ->" + userID);
+                Log.d(TAG, "logIn: configID ->" + configID);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(getString(R.string.user_id), userID);
+                editor.putString(getString(R.string.config_id), configID);
+                editor.apply();
+                editor.commit();
+                Toast.makeText(getApplicationContext(), "The config ID is valid", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(getApplicationContext(), "The config ID is not valid", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private int determineSetupStepNumberFromLauncher() {
         final int stepNumber = determineSetupStepNumber();
-        if (stepNumber == STEP_1) {
+        if (stepNumber == STEP_0) {
             return STEP_WELCOME;
         }
         if (stepNumber == STEP_3) {
@@ -422,6 +495,9 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
         mHandler.cancelPollingImeSettings();
         if (FORCE_TO_SHOW_WELCOME_SCREEN) {
             return STEP_1;
+        }
+        if (!isLogIn()) {
+            return STEP_0;
         }
         if (!UncachedInputMethodManagerUtils.isThisImeEnabled(this, mImm)) {
             return STEP_1;
@@ -445,7 +521,7 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
     }
 
     private static boolean isInSetupSteps(final int stepNumber) {
-        return stepNumber >= STEP_1 && stepNumber <= STEP_3;
+        return stepNumber >= STEP_0 && stepNumber <= STEP_3;
     }
 
     @Override
@@ -539,7 +615,7 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
         mActionFinish.setVisibility((mStepNumber == STEP_3) ? View.VISIBLE : View.GONE);
     }
 
-    static final class SetupStep implements View.OnClickListener {
+    final class SetupStep implements View.OnClickListener {
         public final int mStepNo;
         private final View mStepView;
         private final TextView mBulletView;
@@ -549,6 +625,7 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
         private final String mFinishedInstruction;
         private final TextView mActionLabel;
         private Runnable mAction;
+        private LogInAction mLogInAction;
 
         public SetupStep(final int stepNo, final String applicationName, final TextView bulletView,
                          final View stepView, final int title, final int instruction,
@@ -592,9 +669,22 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
             mAction = action;
         }
 
+        public void setLogInAction(LogInAction action){
+            mActionLabel.setOnClickListener(this);
+            mLogInAction = action;
+        }
+
         @Override
         public void onClick(final View v) {
-            if (v == mActionLabel && mAction != null) {
+
+            if(v == mActionLabel && mLogInAction != null){
+                if(mStepView.findViewById(R.id.user_id) != null && mStepView.findViewById(R.id.config_id ) != null ){
+                    mLogInAction.run(
+                            ((EditText) mStepView.findViewById(R.id.user_id)).getText().toString(),
+                            ((EditText) mStepView.findViewById(R.id.config_id)).getText().toString());
+                }
+                return;
+            }else if (v == mActionLabel && mAction != null) {
                 mAction.run();
                 return;
             }
@@ -617,7 +707,11 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
             for (final SetupStep step : mGroup) {
                 step.setEnabled(step.mStepNo == enableStepNo, isStepActionAlreadyDone);
             }
-            mIndicatorView.setIndicatorPosition(enableStepNo - STEP_1, mGroup.size());
+            mIndicatorView.setIndicatorPosition(enableStepNo - STEP_0, mGroup.size());
         }
+    }
+
+    interface LogInAction{
+        void run(String userID, String configID);
     }
 }

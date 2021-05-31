@@ -1,8 +1,13 @@
 package pt.lasige.inputmethod.logger;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -200,4 +205,15 @@ public class DataBaseFacade {
         fb.getPrompts(promptID, parentID, studyID, timeframe, true);
     }
 
+    public void anonymousLogin(OnCompleteListener<AuthResult> listener) {
+        fb.anonymousLogin(listener);
+    }
+
+    public void checkIfConfigExists(Context context, String configID, FirebaseController.ConfigCallback callback){
+        fb.getConfig(context, configID, callback);
+    }
+
+    public void changeDatabase(String url){
+        fb.changeDatabase(url);
+    }
 }

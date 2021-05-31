@@ -402,8 +402,12 @@ mobile devices. [CHAR LIMIT=25] -->
     <string name="setup_next_action">Next step</string>
     <!-- Title of the setup wizard. [CHAR LIMT=40] -->
     <string name="setup_steps_title">"Setting up <xliff:g example="Android Keyboard" id="APPLICATION_NAME">%s</xliff:g>"</string>
+    <string name="setup_step0_bullet" translatable="false">1</string>
+    <string name="setup_step0_title" translatable="false">Login</string>
+    <string name="setup_step0_instruction" translatable="false">setup_step0_instruction</string>
+    <string name="setup_step0_action" translatable="false">Validate</string>
     <!-- Ordinal number of the 1st step in the setup wizard. [CHAR LIMIT=5] -->
-    <string name="setup_step1_bullet" translatable="false">1</string>
+    <string name="setup_step1_bullet" translatable="false">2</string>
     <!-- Title of the 1st step in the setup wizard. [CHAR LIMIT=64] -->
     <string name="setup_step1_title">"Enable <xliff:g example="Android Keyboard" id="APPLICATION_NAME">%s</xliff:g>"</string>
     <!-- Detailed instruction of the 1st step in the setup wizard. [CHAR LIMIT=120] -->
@@ -413,7 +417,7 @@ mobile devices. [CHAR LIMIT=25] -->
     <!-- The label of the button that triggers the Languages & input settings in order to enable the keyboard. [CHAR_LIMIT=64] -->
     <string name="setup_step1_action">Enable in Settings</string>
     <!-- Ordinal number of the 2nd step in the setup wizard. [CHAR LIMIT=5] -->
-    <string name="setup_step2_bullet" translatable="false">2</string>
+    <string name="setup_step2_bullet" translatable="false">3</string>
     <!-- Title of the 2nd step in the setup wizard. [CHAR LIMIT=64] -->
     <string name="setup_step2_title">"Switch to <xliff:g example="Android Keyboard" id="APPLICATION_NAME">%s</xliff:g>"</string>
     <!-- Detailed instruction of the 2nd step in the setup wizard. [CHAR LIMIT=120] -->
@@ -421,7 +425,7 @@ mobile devices. [CHAR LIMIT=25] -->
     <!-- The label of the button that triggers the choose input method dialog in order to select the keyboard. [CHAR_LIMIT=64] -->
     <string name="setup_step2_action">Switch input methods</string>
     <!-- Ordinal number of the 3rd step in the setup wizard. [CHAR LIMIT=5] -->
-    <string name="setup_step3_bullet" translatable="false">3</string>
+    <string name="setup_step3_bullet" translatable="false">4</string>
     <!-- Title of the 3rd step in the setup wizard. [CHAR LIMIT=64] -->
     <string name="setup_step3_title">"Congratulations, you're all set!"</string>
     <!-- Detailed instruction of the 3rd step in the setup wizard. [CHAR LIMIT=120] -->
@@ -587,7 +591,8 @@ Tip: You can download and remove dictionaries by going to &lt;b>Languages&#160;&
     <string name="send">Send</string>
     <string name="activate_log">Activate log</string>
     <string name="activate_full_log_of_keys">Activate full log of keys</string>
-    <string name="user_id">User ID</string>
+    <string name="user_id" translatable="false">user_id</string>
+    <string name="config_id" translatable="false">config_id</string>
     <string name="start_demo_activity">Start demo activity</string>
     <string name="demo_activity_desc">Starts the demo activity for demo/testing purposes</string>
     <string name="start">Start</string>

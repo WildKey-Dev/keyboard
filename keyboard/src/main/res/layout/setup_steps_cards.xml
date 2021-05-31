@@ -26,6 +26,10 @@
         android:paddingTop="@dimen/setup_step_vertical_padding"
         android:orientation="horizontal">
         <TextView
+            android:id="@+id/setup_step0_bullet"
+            style="@style/setupStepBulletStyle"
+            android:text="@string/setup_step0_bullet" />
+        <TextView
             android:id="@+id/setup_step1_bullet"
             style="@style/setupStepBulletStyle"
             android:text="@string/setup_step1_bullet" />
@@ -45,6 +49,9 @@
         android:id="@+id/setup_steps_pane"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <include
+            android:id="@+id/setup_step0"
+            layout="@layout/setup_step_login" />
         <include
             android:id="@+id/setup_step1"
             layout="@layout/setup_step" />

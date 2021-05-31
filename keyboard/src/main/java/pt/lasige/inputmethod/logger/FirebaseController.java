@@ -2,10 +2,13 @@ package pt.lasige.inputmethod.logger;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
@@ -15,6 +18,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,18 +35,45 @@ public class FirebaseController {
     private static final String TAG = "FirebaseController";
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
+    private String configID;
 
     public FirebaseController() {
-        this.database = FirebaseDatabase.getInstance();
         this.mAuth = FirebaseAuth.getInstance();
+
+        FirebaseUser user = this.mAuth.getCurrentUser();
+
+        if (user != null){
+            if(user.isAnonymous()){
+                this.database = FirebaseDatabase.getInstance("https://cns-study.europe-west1.firebasedatabase.app/");
+            }else {
+                this.database = FirebaseDatabase.getInstance();
+            }
+        }else {
+            this.database = FirebaseDatabase.getInstance();
+        }
+    }
+
+    /**
+     *
+     * @param url if url == null database will bew the default
+     */
+    public void changeDatabase(String url){
+        Log.d(TAG, "changeDatabase: url " + url);
+        if(url != null){
+            this.database = FirebaseDatabase.getInstance(url);
+        }else {
+            this.database = FirebaseDatabase.getInstance();
+        }
     }
 
     public void setConfigIDListener(Context context){
+        if (configID != null)
+            return;
+
         getConfig(context);
     }
 
     public void getConfig(Context context){
-
         if(this.mAuth.getCurrentUser() != null){
             database.getReference("/users/"+this.mAuth.getCurrentUser().getUid()+"/config/").addValueEventListener(new ValueEventListener() {
                 @Override
@@ -73,7 +105,6 @@ public class FirebaseController {
                 }
             });
         }
-
     }
 
     public void getPrompts(String promptID, String parent, String studyID, TimeFrame timeFrame, boolean isQuestion){
@@ -130,6 +161,65 @@ public class FirebaseController {
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.w(TAG, "Failed to read value.", databaseError.toException());
+                }
+            });
+        }
+    }
+
+    public String getConfigID() {
+        return configID;
+    }
+
+    public void setConfigID(String configID) {
+        this.configID = configID;
+    }
+
+    public void getConfig(Context context, String configID, ConfigCallback callback){
+        if(this.mAuth.getCurrentUser() != null){
+            database.getReference("/config/"+configID).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    // This method is called once with the initial value and again
+                    // whenever data at this location is updated.
+                    try {
+                        Config c = dataSnapshot.getValue(Config.class);
+                        if (c != null) {
+                            ScheduleController.getInstance().cancelAllAlarms(context);
+                            for(TimeFrame timeFrame : c.getTimeFrames()){
+                                ScheduleController.getInstance().putTimeFrame(timeFrame.getTimeFrameID(), timeFrame);
+                                timeFrame.setAlarm(context);
+                                for (String task: timeFrame.getTasks()) {
+                                    getPrompts(task, null, c.getStudyId(), timeFrame, false);
+                                }
+                            }
+                            ScheduleController.getInstance().setConfig(c);
+                            callback.onResponse(true);
+                        }else {
+                            Log.d("NULL", "NULLLLLLLLLLLLLLLLLLLLLLLL");
+                            callback.onResponse(false);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    // Failed to read value
+                    Log.w(TAG, "Failed to read value.", error.toException());
+                }
+            });
+        }else {
+            anonymousLogin(task -> {
+                if (task.isSuccessful()) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInAnonymously:success");
+                    changeDatabase("https://cns-study.europe-west1.firebasedatabase.app/");
+                    getConfig(context, configID, callback);
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInAnonymously:failure", task.getException());
+                    Toast.makeText(context, "Something went wrong. Try again later", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -204,6 +294,27 @@ public class FirebaseController {
                 });
     }
 
+    public void firebaseAuthAnonymous(Context context, String userID, int densityDpi, int height, int width) {
+
+        FirebaseUser user = mAuth.getCurrentUser();
+        if(user != null){
+
+            write("brand", Build.BRAND, "/users/"+user.getUid()+"/device/");
+            write("device", Build.DEVICE, "/users/"+user.getUid()+"/device/");
+            write("densityDpi", densityDpi, "/users/"+user.getUid()+"/device/display/");
+            write("display", Build.DISPLAY, "/users/"+user.getUid()+"/device/display/");
+            write("height", height, "/users/"+user.getUid()+"/device/display/");
+            write("width", width, "/users/"+user.getUid()+"/device/display/");
+            write("model", Build.MODEL, "/users/"+user.getUid()+"/device/");
+            write("release", Build.VERSION.RELEASE, "/users/"+user.getUid()+"/device/");
+            write("sdk", Build.VERSION.SDK_INT, "/users/"+user.getUid()+"/device/");
+            write("id", user.getUid(), "/user-list/"+user.getUid()+"/");
+            setConfigIDListener(context);
+
+        }
+
+    }
+
     public boolean setFCMToken(String token) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -275,4 +386,18 @@ public class FirebaseController {
     public void cleanTasks(){
         database.getReference("/users/").child(getUser().getUid()).child("completedTasks").removeValue();
     }
+
+    public void anonymousLogin(OnCompleteListener<AuthResult> listener) {
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            mAuth.signInAnonymously().addOnCompleteListener(listener);
+        }
+    }
+
+    public interface ConfigCallback{
+        void onResponse(boolean result);
+    }
+
+
 }
