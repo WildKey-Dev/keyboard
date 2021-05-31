@@ -16,11 +16,11 @@
 
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:latin="http://schemas.android.com/apk/res/pt.lasige.inputmethod.latin"
+    xmlns:latin="http://schemas.android.com/apk/res/pt.lasige.demo.inputmethod.latin"
     android:key="@string/english_ime_name">
 
     <PreferenceScreen
-        android:fragment="pt.lasige.inputmethod.latin.settings.SettingsFragment"
+        android:fragment="pt.lasige.demo.inputmethod.latin.settings.SettingsFragment"
         android:title="@string/settings"
         android:key="screen_main_settings" />
     <Preference

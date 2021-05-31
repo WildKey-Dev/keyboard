@@ -13,7 +13,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     coreApp="true"
-    package="pt.lasige.inputmethod.latin">
+    package="pt.lasige.demo.inputmethod.latin">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
@@ -33,17 +33,17 @@
          To use this, add the following line into calling application's AndroidManifest.xml
          <pre>
          {@code
-         <uses-permission android:name="pt.lasige.inputmethod.latin.HIDE_SOFT_INPUT"/>
+         <uses-permission android:name="pt.lasige.demo.inputmethod.latin.HIDE_SOFT_INPUT"/>
          }
          </pre>
          then call {@link android.content.Context#sendBroadcast(Intent)} as follows:
          <pre>
          {@code
-         sendBroadcast(new Intent("pt.lasige.inputmethod.latin.HIDE_SOFT_INPUT")
-                 .setPackage("pt.lasige.inputmethod.latin"));
+         sendBroadcast(new Intent("pt.lasige.demo.inputmethod.latin.HIDE_SOFT_INPUT")
+                 .setPackage("pt.lasige.demo.inputmethod.latin"));
          }
          </pre> -->
-    <permission android:name="pt.lasige.inputmethod.latin.HIDE_SOFT_INPUT"
+    <permission android:name="pt.lasige.demo.inputmethod.latin.HIDE_SOFT_INPUT"
         android:protectionLevel="signature" />
 
     <application android:label="@string/english_ime_name"
@@ -54,20 +54,20 @@
         android:directBootAware="true">
 
 
-        <activity android:name="pt.lasige.inputmethod.study.TranscriptionActivity"/>
-        <activity android:name="pt.lasige.inputmethod.study.CompositionActivity"/>
-        <activity android:name="pt.lasige.inputmethod.study.AlternateFingerTappingActivity" />
-        <activity android:name="pt.lasige.inputmethod.study.DemoActivity"/>
-        <activity android:name="pt.lasige.inputmethod.study.PromptLauncherActivity"/>
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireLauncherActivity" android:theme="@style/MyQuestionnaire"/>
-        <activity android:name="pt.lasige.inputmethod.latin.settings.SettingsLauncherActivity" />
+        <activity android:name="pt.lasige.demo.inputmethod.study.TranscriptionActivity"/>
+        <activity android:name="pt.lasige.demo.inputmethod.study.CompositionActivity"/>
+        <activity android:name="pt.lasige.demo.inputmethod.study.AlternateFingerTappingActivity" />
+        <activity android:name="pt.lasige.demo.inputmethod.study.DemoActivity"/>
+        <activity android:name="pt.lasige.demo.inputmethod.study.PromptLauncherActivity"/>
+        <activity android:name="pt.lasige.demo.inputmethod.study.questionnaire.QuestionnaireLauncherActivity" android:theme="@style/MyQuestionnaire"/>
+        <activity android:name="pt.lasige.demo.inputmethod.latin.settings.SettingsLauncherActivity" />
 
         <receiver
-            android:name="pt.lasige.inputmethod.study.scheduler.notification.AlarmReceiver"
+            android:name="pt.lasige.demo.inputmethod.study.scheduler.notification.AlarmReceiver"
             android:enabled="true" />
 
         <!-- Services -->
-        <service android:name="LatinIME"
+        <service android:name="pt.lasige.demo.inputmethod.latin.LatinIME"
             android:label="@string/english_ime_name"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
@@ -76,7 +76,7 @@
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
 
-        <service android:name=".spellcheck.AndroidSpellCheckerService"
+        <service android:name="pt.lasige.demo.inputmethod.latin.spellcheck.AndroidSpellCheckerService"
             android:label="@string/spell_checker_service_name"
             android:permission="android.permission.BIND_TEXT_SERVICE">
             <intent-filter>
@@ -86,12 +86,12 @@
                 android:resource="@xml/spellchecker" />
         </service>
 
-        <service android:name="pt.lasige.inputmethod.dictionarypack.DictionaryService"
+        <service android:name="pt.lasige.demo.inputmethod.dictionarypack.DictionaryService"
             android:label="@string/dictionary_service_name">
         </service>
 
         <!-- Activities -->
-        <activity android:name=".setup.SetupActivity"
+        <activity android:name="pt.lasige.demo.inputmethod.latin.setup.SetupActivity"
             android:theme="@style/platformActivityTheme"
             android:label="@string/english_ime_name"
             android:icon="@drawable/ic_launcher_keyboard"
@@ -104,13 +104,13 @@
         </activity>
 
         <activity
-            android:name=".permissions.PermissionsActivity"
+            android:name="pt.lasige.demo.inputmethod.latin.permissions.PermissionsActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:exported="false"
             android:taskAffinity="" >
         </activity>
 
-        <activity android:name=".setup.SetupWizardActivity"
+        <activity android:name="pt.lasige.demo.inputmethod.latin.setup.SetupWizardActivity"
             android:theme="@style/platformActivityTheme"
             android:label="@string/english_ime_name"
             android:clearTaskOnLaunch="true">
@@ -119,7 +119,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".settings.SettingsActivity"
+        <activity android:name="pt.lasige.demo.inputmethod.latin.settings.SettingsActivity"
             android:theme="@style/platformSettingsTheme"
             android:label="@string/english_ime_settings">
             <intent-filter>
@@ -127,7 +127,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".spellcheck.SpellCheckerSettingsActivity"
+        <activity android:name="pt.lasige.demo.inputmethod.latin.spellcheck.SpellCheckerSettingsActivity"
             android:theme="@style/platformSettingsTheme"
             android:label="@string/android_spell_checker_settings">
             <intent-filter>
@@ -135,7 +135,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="pt.lasige.inputmethod.dictionarypack.DictionarySettingsActivity"
+        <activity android:name="pt.lasige.demo.inputmethod.dictionarypack.DictionarySettingsActivity"
             android:theme="@style/platformSettingsTheme"
             android:label="@string/dictionary_settings_title"
             android:uiOptions="splitActionBarWhenNarrow">
@@ -144,7 +144,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="pt.lasige.inputmethod.dictionarypack.DownloadOverMeteredDialog"
+        <activity android:name="pt.lasige.demo.inputmethod.dictionarypack.DownloadOverMeteredDialog"
             android:theme="@style/platformActivityTheme"
             android:label="@string/dictionary_install_over_metered_network_prompt">
             <intent-filter>
@@ -153,11 +153,11 @@
         </activity>
 
         <!-- Unexported activity used for tests. -->
-        <activity android:name=".settings.TestFragmentActivity"
+        <activity android:name="pt.lasige.demo.inputmethod.latin.settings.TestFragmentActivity"
             android:exported="false" />
 
         <!-- Broadcast receivers -->
-        <receiver android:name="SystemBroadcastReceiver">
+        <receiver android:name="pt.lasige.demo.inputmethod.latin.SystemBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -166,49 +166,36 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="DictionaryPackInstallBroadcastReceiver" android:exported="false">
+        <receiver android:name="pt.lasige.demo.inputmethod.latin.DictionaryPackInstallBroadcastReceiver" android:exported="false">
             <intent-filter>
-                <action android:name="pt.lasige.inputmethod.dictionarypack.aosp.UNKNOWN_CLIENT" />
+                <action android:name="pt.lasige.demo.inputmethod.dictionarypack.aosp.UNKNOWN_CLIENT" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="pt.lasige.inputmethod.dictionarypack.EventHandler">
+        <receiver android:name="pt.lasige.demo.inputmethod.dictionarypack.EventHandler">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
                 <action android:name="android.intent.action.DATE_CHANGED" />
-                <action android:name="pt.lasige.inputmethod.dictionarypack.aosp.UPDATE_NOW" />
-                <action android:name="pt.lasige.inputmethod.dictionarypack.aosp.INIT_AND_UPDATE_NOW" />
+                <action android:name="pt.lasige.demo.inputmethod.dictionarypack.aosp.UPDATE_NOW" />
+                <action android:name="pt.lasige.demo.inputmethod.dictionarypack.aosp.INIT_AND_UPDATE_NOW" />
             </intent-filter>
         </receiver>
 
         <!-- Broadcast receiver for AccountManager#LOGIN_ACCOUNTS_CHANGED_ACTION. -->
-        <receiver android:name=".accounts.AccountsChangedReceiver">
+        <receiver android:name="pt.lasige.demo.inputmethod.latin.accounts.AccountsChangedReceiver">
             <intent-filter>
                 <action android:name="android.accounts.LOGIN_ACCOUNTS_CHANGED" />
             </intent-filter>
         </receiver>
 
         <!-- Content providers -->
-        <provider android:name="pt.lasige.inputmethod.dictionarypack.DictionaryProvider"
+        <provider android:name="pt.lasige.demo.inputmethod.dictionarypack.DictionaryProvider"
             android:grantUriPermissions="true"
             android:exported="false"
             android:authorities="@string/authority"
             android:multiprocess="false"
             android:label="@string/dictionary_provider_name">
         </provider>
-
-
-        <service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.components.ComponentDiscoveryService">
-            <meta-data android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
-        </service>
-        <service
-            android:name="pt.lasige.inputmethod.logger.MyFirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-        <activity android:exported="false" android:name="com.google.android.gms.common.api.GoogleApiActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
     </application>
 
 </manifest>

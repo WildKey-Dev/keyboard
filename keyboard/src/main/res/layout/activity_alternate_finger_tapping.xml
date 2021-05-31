@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:layout_alignParentStart="true"
     android:id="@+id/rl_bg"
-    tools:context="pt.lasige.inputmethod.study.AlternateFingerTappingActivity">
+    tools:context="pt.lasige.demo.inputmethod.study.AlternateFingerTappingActivity">
 
     <TextView
         android:id="@+id/tv_text"

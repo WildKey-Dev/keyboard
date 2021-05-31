@@ -1,117 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="pt.lasige.inputmethod.study.DemoActivity">
+    tools:context="pt.lasige.demo.inputmethod.study.DemoActivity">
 
     <Button
         android:id="@+id/bt_transcription"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_gravity="center"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
         android:background="@drawable/bt_bg_selector"
+        android:text="Transcription"
         android:textColor="@drawable/bt_text_selector"
-        android:text="Transcription" />
+        app:layout_constraintEnd_toStartOf="@+id/bt_transcription_schedule"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Spinner
-        android:id="@+id/sp_transcription"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/bt_transcription_schedule"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bt_transcription"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bt_bg_selector"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Schedule 1 min"
+        android:textColor="@drawable/bt_text_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/bt_composition"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sp_transcription"
         android:layout_alignParentStart="true"
         android:layout_gravity="center"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
         android:background="@drawable/bt_bg_selector"
+        android:text="Composition"
         android:textColor="@drawable/bt_text_selector"
-        android:text="Composition" />
+        app:layout_constraintEnd_toStartOf="@+id/bt_composition_schedule"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_transcription" />
 
-    <Spinner
-        android:id="@+id/sp_composition"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/bt_composition_schedule"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bt_composition"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bt_bg_selector"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Schedule 1 min"
+        android:textColor="@drawable/bt_text_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_transcription_schedule" />
 
     <Button
         android:id="@+id/bt_questionnaire"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sp_composition"
         android:layout_alignParentStart="true"
         android:layout_gravity="center"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
         android:background="@drawable/bt_bg_selector"
+        android:text="Questionnaire"
         android:textColor="@drawable/bt_text_selector"
-        android:text="Questionnaire" />
+        app:layout_constraintEnd_toStartOf="@+id/bt_questionnaire_schedule"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_composition" />
 
-    <Spinner
-        android:id="@+id/sp_questionnaire"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/bt_questionnaire_schedule"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bt_questionnaire"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bt_bg_selector"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Schedule 1 min"
+        android:textColor="@drawable/bt_text_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_composition_schedule" />
 
     <Button
         android:id="@+id/bt_fingertapping"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/sp_questionnaire"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="false"
         android:layout_gravity="center"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
         android:layout_weight="1"
         android:background="@drawable/bt_bg_selector"
+        android:text="FingerTap"
         android:textColor="@drawable/bt_text_selector"
-        android:text="FingerTap" />
-
-    <Spinner
-        android:id="@+id/sp_fingertapping"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/bt_fingertapping"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_weight="1" />
+        app:layout_constraintEnd_toStartOf="@+id/bt_fingertapping_schedule"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_questionnaire" />
 
     <Button
-        android:id="@+id/bt_clear_all"
-        android:layout_width="match_parent"
+        android:id="@+id/bt_fingertapping_schedule"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="center"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/bt_bg_selector_inverted"
-        android:textColor="@drawable/bt_text_selector_inverted"
-        android:text="Erase completed Tasks" />
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bt_bg_selector"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Schedule 1 min"
+        android:textColor="@drawable/bt_text_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_questionnaire_schedule" />
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/bt_save"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="Save data to external storage"
+        android:background="@drawable/bt_bg_selector"
+        android:textColor="@drawable/bt_text_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_fingertapping" />
+
+    <Button
+        android:id="@+id/bt_delete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="Delete internal data"
+        android:background="@drawable/bt_bg_selector"
+        android:textColor="@drawable/bt_text_selector"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_save" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
