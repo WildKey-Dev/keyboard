@@ -284,4 +284,5 @@
     <string name="session_manager_sub_menu_summary">Contém opções para apagar a sessão</string>
     <string name="session_manager">Gestão da sessão</string>
     <string name="setup_step0_action">Validar</string>
+    <string name="number_must_be_between_x_and_y">O número tem que estar entre %1$s e %2$s</string>
 </resources>
