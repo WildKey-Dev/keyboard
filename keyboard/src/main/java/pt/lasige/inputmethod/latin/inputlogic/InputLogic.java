@@ -418,7 +418,9 @@ public final class InputLogic {
 
 
         try{
-            LoggerController.getInstance().getLogger().addCursorChange(new CursorChange(oldSelStart, oldSelEnd, newSelStart, newSelEnd, mConnection.getmComposingText().length(), System.currentTimeMillis()));
+            String composingText = mConnection.getmComposingText();
+            if(composingText != null)
+                LoggerController.getInstance().getLogger().addCursorChange(new CursorChange(oldSelStart, oldSelEnd, newSelStart, newSelEnd, composingText.length(), System.currentTimeMillis()));
         }catch (Exception e){
             e.printStackTrace();
             DataBaseFacade.getInstance().write("error", "something went wrong with cursor change: " + e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");

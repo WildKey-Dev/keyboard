@@ -7,8 +7,11 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -71,7 +74,9 @@ public class ScaleSliderCustom implements Step {
             boolean nextEnabled = false;
             SurveyTheme surveyTheme;
             Date start, end;
-
+            SeekBar sb;
+            EditText et;
+            
             @Override
             public void setupViews() {
                 this.start = Calendar.getInstance().getTime();
@@ -87,7 +92,9 @@ public class ScaleSliderCustom implements Step {
                 ((TextView) root.findViewById(R.id.tv_scale_higher_value)).setText(higherBound);
                 ((TextView) root.findViewById(R.id.tv_scale_lower_value)).setText(lowerBound);
                 ((TextView) root.findViewById(R.id.tv_question)).setText(question);
-
+                sb = root.findViewById(R.id.seekBar);
+                et = root.findViewById(R.id.tv_selected);
+                
                 root.findViewById(R.id.button_continue).setOnClickListener(view -> {
                     this.getOnNextListener().invoke(createResults());
                 });
@@ -108,15 +115,37 @@ public class ScaleSliderCustom implements Step {
                     aDialog.setOnShowListener(dialog -> aDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED));
                     aDialog.show();
                 });
-                ((SeekBar) root.findViewById(R.id.seekBar)).setProgress(scale);
-                ((TextView) root.findViewById(R.id.tv_selected)).setText(String.valueOf(scale));
+                sb.setProgress(scale);
+                et.setText(String.valueOf(scale));
                 if(scale > 0)
                     nextEnabled = true;
 
-                ((SeekBar) root.findViewById(R.id.seekBar)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                et.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if(s.toString().isEmpty() || Integer.parseInt(s.toString()) < 0 ||
+                                Integer.parseInt(s.toString()) > sb.getMax()){
+                            et.setError(String.format(getContext().getString(R.string.number_must_be_between_x_and_y), "0", String.valueOf(sb.getMax())));
+                        }else {
+                            sb.setProgress(Integer.parseInt(s.toString()));
+                        }
+                    }
+                });
+                sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                        ((TextView) root.findViewById(R.id.tv_selected)).setText(String.valueOf(i));
+                        if(Integer.parseInt(et.getText().toString()) != i)
+                            et.setText(String.valueOf(i));
                         nextEnabled = true;
                         colorMainButtonEnabledState();
                     }
@@ -150,7 +179,7 @@ public class ScaleSliderCustom implements Step {
             @Override
             public QuestionResult createResults() {
                 this.end = Calendar.getInstance().getTime();
-                scale = ((SeekBar) root.findViewById(R.id.seekBar)).getProgress();
+                scale = sb.getProgress();
                 return new ScaleSliderCustomResult(scale, id, start, end);
             }
 
