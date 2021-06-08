@@ -5,9 +5,6 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -17,7 +14,6 @@ public class DataBaseFacade {
 
     private static DataBaseFacade instance;
     private FirebaseController fb;
-    private String localUserID;
     private boolean demo = false;
 
     public static DataBaseFacade getInstance(){
@@ -31,20 +27,12 @@ public class DataBaseFacade {
         fb = new FirebaseController();
     }
 
-    public String getLocalUserID() {
-        return localUserID;
-    }
-
     public FirebaseController getFb() {
         return fb;
     }
 
-    public String getFbUserID() {
-        FirebaseUser user = fb.getUser();
-        if(user != null)
-            return user.getUid();
-        else
-            return null;
+    public String getUserID() {
+        return fb.getUserID();
     }
 
     public boolean isDemo() {
@@ -57,7 +45,7 @@ public class DataBaseFacade {
     }
 
     public void setLocalUserID(String localUserID) {
-        this.localUserID = localUserID;
+        fb.setLocalUserID(localUserID);
     }
 
     public void write(String key, Object value, String path){
@@ -83,14 +71,14 @@ public class DataBaseFacade {
         if (isDemo())
             return;
 
-        writeIfNotExists("init", currentTimeMillis, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
+        writeIfNotExists("init", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
     }
 
     public void setEndTS(String studyID, String questionID, long currentTimeMillis) {
         if (isDemo())
             return;
 
-        write("end", currentTimeMillis, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
+        write("end", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
     }
 
     public void getCurrentPhrase(String studyID, String questionID, PhraseObserver obs) {
@@ -105,21 +93,21 @@ public class DataBaseFacade {
         if (isDemo())
             return;
 
-        writeIfNotExists("init", currentTimeMillis, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/interruptions/"+index+"/");
+        writeIfNotExists("init", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/interruptions/"+index+"/");
     }
 
     public void setInterruptionEndTS(String studyID, String questionID, int index, long currentTimeMillis) {
         if (isDemo())
             return;
 
-        write("end", currentTimeMillis, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/interruptions/"+index+"/");
+        write("end", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/interruptions/"+index+"/");
     }
 
     public void setTimeRemaining(String studyID, String questionID, long currentTimeMillis) {
         if (isDemo())
             return;
 
-        write("timeRemaining", currentTimeMillis, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
+        write("timeRemaining", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
     }
 
 
@@ -127,55 +115,55 @@ public class DataBaseFacade {
         if (isDemo())
             return;
 
-        write("finished", finished, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
+        write("finished", finished, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
     }
 
     public void setQuestionnaireCheckboxResponse(ArrayList<String> selected, String studyID, String questionID, String questionnaireID, long timeSpent) {
         if (isDemo())
             return;
 
-        write("response", selected,  "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
-        write("time", timeSpent,  "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("response", selected,  "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("time", timeSpent,  "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
     }
 
     public void setQuestionnaireScaleResponse(int scale, String studyID, String questionID, String questionnaireID, long timeSpent) {
         if (isDemo())
             return;
 
-        write("scale", scale, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/response/");
-        write("time", timeSpent, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/response/");
+        write("scale", scale, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/response/");
+        write("time", timeSpent, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/response/");
     }
 
     public void setQuestionnaireSeekBarResponse(int scale, String studyID, String questionID, String questionnaireID, long timeSpent) {
         if (isDemo())
             return;
 
-        write("response", scale, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
-        write("time", timeSpent, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("response", scale, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("time", timeSpent, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
     }
 
     public void setQuestionnaireRadioResponse(String response, String studyID, String questionID, String questionnaireID, long timeSpent) {
         if (isDemo())
             return;
 
-        write("response", response, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
-        write("time", timeSpent, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("response", response, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("time", timeSpent, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
     }
 
     public void setQuestionnaireHourResponse(String hour, String studyID, String questionID, String questionnaireID, long timeSpent) {
         if (isDemo())
             return;
 
-        write("response", hour, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
-        write("time", timeSpent, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("response", hour, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("time", timeSpent, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
     }
 
     public void setQuestionnaireTextResponse(String text, String studyID, String questionID, String questionnaireID, long timeSpent) {
-        write("time", timeSpent, "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("time", timeSpent, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
         if (isDemo())
             return;
 
-        write("response", text,  "/users/"+ getFbUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
+        write("response", text,  "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionnaireID+"/"+questionID+"/");
     }
 
     public void getCurrentQuestionnaireQuestion(String studyID, String questionnaireID, QuestionnaireObserver obs) {
@@ -186,15 +174,15 @@ public class DataBaseFacade {
         if (isDemo())
             return;
 
-        write("right", right, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/"+finger+"/");
-        write("wrong", wrong, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/"+finger+"/");
+        write("right", right, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/"+finger+"/");
+        write("wrong", wrong, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/"+finger+"/");
     }
 
     public void setFingerTappingAvg(String studyID, String questionID, double avg) {
         if (isDemo())
             return;
 
-        write("avg", avg, "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
+        write("avg", avg, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
     }
 
     public void cleanTasks(){
@@ -209,11 +197,19 @@ public class DataBaseFacade {
         fb.anonymousLogin(listener);
     }
 
-    public void checkIfConfigExists(Context context, String configID, FirebaseController.ConfigCallback callback){
-        fb.getConfig(context, configID, callback);
+    public void setConfigID(Context context, String configID, FirebaseController.ConfigCallback callback){
+        fb.setConfigID(context, configID, callback);
     }
 
     public void changeDatabase(String url){
         fb.changeDatabase(url);
+    }
+
+    public void deleteConfig(){
+        fb.deleteConfig();
+    }
+
+    public void deleteConfig(int phrase){
+        fb.deleteConfig(phrase);
     }
 }

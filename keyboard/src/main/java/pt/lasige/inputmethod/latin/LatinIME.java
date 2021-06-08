@@ -617,7 +617,7 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         DataBaseFacade.getInstance().getFb().setConfigIDListener(getApplicationContext());
-        DataBaseFacade.getInstance().setLocalUserID(prefs.getString(Settings.PREF_USER_ID, "null"));
+        DataBaseFacade.getInstance().setLocalUserID(prefs.getString(getString(R.string.user_id), null));
         // TODO: Resolve mutual dependencies of {@link #loadSettings()} and
         // {@link #resetDictionaryFacilitatorIfNecessary()}.
         loadSettings();

@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="pref_log"
-        android:title="@string/activate_log" />
+    <PreferenceCategory android:title="@string/session_manager">
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="pref_log_keys_up_down"
-        android:title="@string/activate_full_log_of_keys" />
+    </PreferenceCategory>
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="pref_log_implicit"
-        android:title="@string/activate_implicit_log" />
+    <EditTextPreference
+        android:key="change_config_id"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/change_session_code" />
 
+    <PreferenceScreen
+        android:fragment="pt.lasige.inputmethod.latin.settings.StudySettingsFragmentSubMenu"
+        android:key="open_sub_menu"
+        android:summary="@string/session_manager_sub_menu_summary"
+        android:title="@string/session_manager_sub_menu_title" />
+    <PreferenceCategory android:title="@string/reset_all">
+
+    </PreferenceCategory>
+    <Preference
+        android:title="@string/reset_all"
+        android:key="reset_all"
+        android:summary="@string/reset_all_summary"
+        />
 
 </PreferenceScreen>

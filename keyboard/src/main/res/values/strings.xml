@@ -404,8 +404,8 @@ mobile devices. [CHAR LIMIT=25] -->
     <string name="setup_steps_title">"Setting up <xliff:g example="Android Keyboard" id="APPLICATION_NAME">%s</xliff:g>"</string>
     <string name="setup_step0_bullet" translatable="false">1</string>
     <string name="setup_step0_title" translatable="false">Login</string>
-    <string name="setup_step0_instruction" translatable="false">setup_step0_instruction</string>
-    <string name="setup_step0_action" translatable="false">Validate</string>
+    <string name="setup_step0_instruction" translatable="false"/>
+    <string name="setup_step0_action">Validate</string>
     <!-- Ordinal number of the 1st step in the setup wizard. [CHAR LIMIT=5] -->
     <string name="setup_step1_bullet" translatable="false">2</string>
     <!-- Title of the 1st step in the setup wizard. [CHAR LIMIT=64] -->
@@ -637,4 +637,22 @@ Tip: You can download and remove dictionaries by going to &lt;b>Languages&#160;&
     <string name="leave_negative_button">Cancel task</string>
     <string name="pending_task">%1$s pending task</string>
     <string name="pending_tasks">%1$s pending tasks</string>
+    <string name="reset_current_task">Reset session</string>
+    <string name="reset_tasks_summary">Deletes any progress for the current session</string>
+    <string name="reset_all">Finish session</string>
+    <string name="reset_all_summary">Finishes the session on the app</string>
+    <string name="user_config_deleted">User and config deleted</string>
+    <string name="invalid_config_2">The config ID is no longer valid. Please close the app and provide another config ID</string>
+    <string name="checking_config">Checking if config exists…</string>
+    <string name="config_is_valid">The config ID is valid</string>
+    <string name="config_is_invalid">The config ID is not valid</string>
+    <string name="delete_phrases_after_summary">Delete phrases after:</string>
+    <string name="delete_phrases_after_title">Delete phrases after</string>
+    <string name="phrase_number">Phrase number</string>
+    <string name="phrase_x">Phrase %1$d</string>
+    <string name="transcription_task">Transcription Task</string>
+    <string name="change_session_code">Change session code</string>
+    <string name="session_manager_sub_menu_title">Advanced options</string>
+    <string name="session_manager_sub_menu_summary">Contains options to delete the session</string>
+    <string name="session_manager">Session Manager</string>
 </resources>

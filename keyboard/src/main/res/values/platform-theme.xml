@@ -19,7 +19,7 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="platformActivityTheme" parent="Theme.MaterialComponents.Light" />
-    <style name="platformSettingsTheme" parent="Theme.MaterialComponents.Light" />
-    <style name="platformDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog" />
+    <style name="platformActivityTheme" parent="Wildkey.NoActionBar" />
+    <style name="platformSettingsTheme" parent="Wildkey.NoActionBar" />
+    <style name="platformDialogTheme" parent="Wildkey.Dialog" />
 </resources>

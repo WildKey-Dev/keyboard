@@ -20,6 +20,8 @@ import pt.lasige.inputmethod.study.adapters.PromptLauncherUIController;
 public class ScheduleController {
     private static ScheduleController instance;
 
+    boolean ignoreDates = true;
+
     Config config;
     public ArrayList<String> queue = new ArrayList<>();
     ArrayList<PendingIntent> alarms = new ArrayList<>();
@@ -84,33 +86,54 @@ public class ScheduleController {
         return nextDate;
     }
 
+    public ArrayList<String> getAllTasks() {
+        ArrayList<String> result = new ArrayList<>();
+        for (TimeFrame tf: timeFrames.values()) {
+            for (String s : tf.getTasks()) {
+                result.add(tf.getTimeFrameID() + "_" + s);
+            }
+        }
+        return result;
+    }
+
     public ArrayList<String> getQueue() {
 
         ArrayList<String> result = new ArrayList<>();
         String start, end;
         Date dStart, dEnd, dNow = Calendar.getInstance().getTime();
-        
-        for (TimeFrame tf: timeFrames.values()){
-            start = tf.getStart();
-            end = tf.getEnd();
-            dStart = getDate(Integer.parseInt(start.split(":")[0]),
-                    Integer.parseInt(start.split(":")[1]),
-                    tf.getDay(),
-                    tf.getMonth(),
-                    tf.getYear());
-            dEnd = getDate(Integer.parseInt(end.split(":")[0]),
-                    Integer.parseInt(end.split(":")[1]),
-                    tf.getDay(),
-                    tf.getMonth(),
-                    tf.getYear());
 
-            if(dNow.after(dStart) && dNow.before(dEnd)) {
+        for (TimeFrame tf: timeFrames.values()){
+            if (ignoreDates){
                 for (String s: tf.getTasks()){
+                    Log.d("QUEUE", "inside  " + tf.getTimeFrameID()+"_"+s);
                     if(queue.contains(tf.getTimeFrameID()+"_"+s))
                         result.add(tf.getTimeFrameID()+"_"+s);
                 }
+            }else {
+                start = tf.getStart();
+                end = tf.getEnd();
+                dStart = getDate(Integer.parseInt(start.split(":")[0]),
+                        Integer.parseInt(start.split(":")[1]),
+                        tf.getDay(),
+                        tf.getMonth(),
+                        tf.getYear());
+                dEnd = getDate(Integer.parseInt(end.split(":")[0]),
+                        Integer.parseInt(end.split(":")[1]),
+                        tf.getDay(),
+                        tf.getMonth(),
+                        tf.getYear());
+
+                if(dNow.after(dStart) && dNow.before(dEnd)) {
+                    for (String s: tf.getTasks()){
+                        if(queue.contains(tf.getTimeFrameID()+"_"+s))
+                            result.add(tf.getTimeFrameID()+"_"+s);
+                    }
+                }
             }
         }
+
+        Log.d("QUEUE", "GET QUEUE  " + queue.toString());
+        Log.d("QUEUE", "GET result " + result.toString());
         return result;
     }
 
@@ -126,6 +149,10 @@ public class ScheduleController {
 
     public Prompt getPrompt(String promptID){
         return singlePrompts.get(promptID);
+    }
+
+    public HashMap<String, Prompt> getPrompts() {
+        return prompts;
     }
 
     public void enqueue(Prompt p, String parent){
@@ -312,5 +339,16 @@ public class ScheduleController {
         }
 
         alarms.clear();
+    }
+
+    public void cleanVars(){
+        queue = new ArrayList<>();
+        alarms = new ArrayList<>();
+        prompts = new HashMap<>();
+        singlePrompts = new HashMap<>();
+        questions = new HashMap<>();
+        timeFrames = new HashMap<>();
+        questionList = new ArrayList<>();
+        questionListIndex = 0;
     }
 }

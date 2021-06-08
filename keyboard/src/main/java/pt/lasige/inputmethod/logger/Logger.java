@@ -1,6 +1,5 @@
 package pt.lasige.inputmethod.logger;
 
-import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
@@ -381,7 +380,7 @@ public class Logger {
 
         }catch (Exception e){
             e.printStackTrace();
-            DataBaseFacade.getInstance().write("error", "something went wrong with input buffer calculation", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+            DataBaseFacade.getInstance().write("error", "something went wrong with input buffer calculation", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
             return "";
         }
     }
@@ -1210,7 +1209,7 @@ public class Logger {
                 }
             }
         }catch (IndexOutOfBoundsException e) {
-            DataBaseFacade.getInstance().write("error", "something went wrong with substitute deleted chars", "/users/"+ DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+            DataBaseFacade.getInstance().write("error", "something went wrong with substitute deleted chars", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
             transcribe = new StringBuilder("substituteDeletedChars: something_went_wrong");
         }
 

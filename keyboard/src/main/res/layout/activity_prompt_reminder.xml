@@ -23,7 +23,7 @@
         android:gravity="center"
         android:text="@string/the_list_is_empty"
         android:textSize="26sp"
-        android:visibility="gone"></TextView>
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/tv_title"
@@ -66,5 +66,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_change_config"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bt_bg_selector"
+        android:padding="20dp"
+        android:text="@string/change_session_code"
+        android:textColor="@drawable/bt_text_selector"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

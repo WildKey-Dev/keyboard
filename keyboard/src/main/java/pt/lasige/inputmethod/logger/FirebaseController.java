@@ -19,11 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 import pt.lasige.inputmethod.logger.data.CompletedTask;
 import pt.lasige.inputmethod.logger.data.Config;
@@ -36,6 +32,7 @@ public class FirebaseController {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private String configID;
+    private String localUserID;
 
     public FirebaseController() {
         this.mAuth = FirebaseAuth.getInstance();
@@ -71,6 +68,10 @@ public class FirebaseController {
             return;
 
         getConfig(context);
+    }
+
+    public void setLocalUserID(String localUserID) {
+        this.localUserID = localUserID;
     }
 
     public void getConfig(Context context){
@@ -122,11 +123,11 @@ public class FirebaseController {
                         String ref;
                         if(parent != null)
                             if(isQuestion)
-                                ref = "/users/"+DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+timeFrame.getTimeFrameID()+"_"+parent+"/"+p.getPromptId()+"/";
+                                ref = "/users/"+DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+timeFrame.getTimeFrameID()+"_"+parent+"/"+p.getPromptId()+"/";
                             else //this is probably never reached
-                                ref = "/users/"+DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+timeFrame.getTimeFrameID()+"_"+parent+"_"+p.getPromptId()+"/";
+                                ref = "/users/"+DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+timeFrame.getTimeFrameID()+"_"+parent+"_"+p.getPromptId()+"/";
                         else
-                            ref = "/users/"+DataBaseFacade.getInstance().getFbUserID()+"/completedTasks/"+studyID+"/"+timeFrame.getTimeFrameID()+"_"+p.getPromptId()+"/";
+                            ref = "/users/"+DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+timeFrame.getTimeFrameID()+"_"+p.getPromptId()+"/";
 
                         database.getReference(ref).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -170,8 +171,9 @@ public class FirebaseController {
         return configID;
     }
 
-    public void setConfigID(String configID) {
+    public void setConfigID(Context context, String configID, ConfigCallback callback) {
         this.configID = configID;
+        getConfig(context, configID, callback);
     }
 
     public void getConfig(Context context, String configID, ConfigCallback callback){
@@ -185,6 +187,7 @@ public class FirebaseController {
                         Config c = dataSnapshot.getValue(Config.class);
                         if (c != null) {
                             ScheduleController.getInstance().cancelAllAlarms(context);
+                            ScheduleController.getInstance().cleanVars();
                             for(TimeFrame timeFrame : c.getTimeFrames()){
                                 ScheduleController.getInstance().putTimeFrame(timeFrame.getTimeFrameID(), timeFrame);
                                 timeFrame.setAlarm(context);
@@ -195,7 +198,6 @@ public class FirebaseController {
                             ScheduleController.getInstance().setConfig(c);
                             callback.onResponse(true);
                         }else {
-                            Log.d("NULL", "NULLLLLLLLLLLLLLLLLLLLLLLL");
                             callback.onResponse(false);
                         }
                     }catch (Exception e){
@@ -252,8 +254,15 @@ public class FirebaseController {
         });
     }
 
-    public FirebaseUser getUser(){
-        return mAuth.getCurrentUser();
+    public String getUserID(){
+
+        if (localUserID != null)
+            return localUserID;
+        else
+        if(mAuth.getCurrentUser() != null)
+            return mAuth.getCurrentUser().getUid();
+        else
+            return "no_uid";
     }
 
     public void firebaseAuthWithGoogle(Context context, String idToken, int densityDpi, int height, int width, boolean saveEmail) {
@@ -326,7 +335,7 @@ public class FirebaseController {
     }
 
     public void getCurrentPhrase(String studyID, String questionID, PhraseObserver obs) {
-        database.getReference("/users/").child(getUser().getUid()).child("completedTasks").child(studyID).child(questionID).child("phrases").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference("/users/").child(getUserID()).child("completedTasks").child(studyID).child(questionID).child("phrases").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int size = 0;
@@ -344,7 +353,7 @@ public class FirebaseController {
     }
 
     public void getTimeRemaining(String studyID, String questionID, PhraseObserver obs) {
-        database.getReference("/users/").child(getUser().getUid()).child("completedTasks").child(studyID).child(questionID).child("timeRemaining").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference("/users/").child(getUserID()).child("completedTasks").child(studyID).child(questionID).child("timeRemaining").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -367,7 +376,7 @@ public class FirebaseController {
     public void getCurrentQuestionnaireQuestion(String studyID, String questionnaireID, QuestionnaireObserver obs) {
 
         ArrayList<String> questionsDone = new ArrayList<>();
-        database.getReference("/users/").child(getUser().getUid()).child("completedTasks").child(studyID).child(questionnaireID).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference("/users/").child(getUserID()).child("completedTasks").child(studyID).child(questionnaireID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() == null) {
@@ -384,7 +393,7 @@ public class FirebaseController {
     }
 
     public void cleanTasks(){
-        database.getReference("/users/").child(getUser().getUid()).child("completedTasks").removeValue();
+        database.getReference("/users/").child(getUserID()).child("completedTasks").removeValue();
     }
 
     public void anonymousLogin(OnCompleteListener<AuthResult> listener) {
@@ -393,6 +402,58 @@ public class FirebaseController {
         if (currentUser == null) {
             mAuth.signInAnonymously().addOnCompleteListener(listener);
         }
+    }
+
+    public void deleteConfig() {
+
+        Log.d("DELETE", "size " + ScheduleController.getInstance().getAllTasks().size());
+        Log.d("DELETE", ScheduleController.getInstance().getAllTasks().toString());
+        for(Prompt prompt: ScheduleController.getInstance().getPrompts().values()){
+            Log.d("DELET", "/users/"+getUserID()+"/completedTasks/"+ScheduleController.getInstance().getConfig().getStudyId()+"/"+prompt.getTimeFrame().getTimeFrameID()+"_"+prompt.getPromptId());
+            database.getReference("/users")
+                    .child(getUserID())
+                    .child("completedTasks")
+                    .child(ScheduleController.getInstance().getConfig().getStudyId())
+                    .child(prompt.getTimeFrame().getTimeFrameID()+"_"+prompt.getPromptId())
+                    .removeValue();
+
+            database.getReference("/users")
+                    .child(getUserID())
+                    .child("completedTasks")
+                    .child(ScheduleController.getInstance().getConfig().getStudyId())
+                    .child(prompt.getTimeFrame().getTimeFrameID()+"_"+prompt.getPromptId()+"-generated-target-phrase")
+                    .removeValue();
+        }
+
+    }
+
+    public void deleteConfig(int phrase) {
+        phrase = phrase - 1;
+        if(ScheduleController.getInstance().getQueue().size() > 0 &&
+                phrase < ScheduleController.getInstance().getPrompt(ScheduleController.getInstance().getQueue().get(0)).getPhrases().size()){
+            for (int i = 0; i < ScheduleController.getInstance().getPrompt(ScheduleController.getInstance().getQueue().get(0)).getPhrases().size(); i++) {
+                if(i > phrase){
+                    database.getReference("/users")
+                            .child(getUserID())
+                            .child("completedTasks")
+                            .child(ScheduleController.getInstance().getConfig().getStudyId())
+                            .child(ScheduleController.getInstance().getQueue().get(0))
+                            .child("phrases")
+                            .child(String.valueOf(i))
+                            .removeValue();
+                }
+            }
+        }
+
+//            database.getReference("/users")
+//                    .child(getUserID())
+//                    .child("completedTasks")
+//                    .child(ScheduleController.getInstance().getConfig().getStudyId())
+//                    .child(ScheduleController.getInstance().getQueue().get(0))
+//                    .child("phrases")
+//                    .child(String.valueOf(phrase))
+//                    .removeValue();
+
     }
 
     public interface ConfigCallback{

@@ -42,6 +42,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.appcompat.view.ContextThemeWrapper;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -444,38 +446,55 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
 
         checkIfConfigExists(userID, configID);
 
-        mStepNumber = determineSetupStepNumber();
-        updateSetupStepView();
     }
 
     boolean isLogIn(){
 
-        return validConfig;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String userID = prefs.getString(getString(R.string.user_id), null);
+        String configID = prefs.getString(getString(R.string.config_id), null);
+
+        if(userID != null && configID != null){
+            DataBaseFacade.getInstance().setConfigID(getApplicationContext(), configID, result -> {
+                if (!result) {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove(getString(R.string.user_id));
+                    editor.remove(getString(R.string.config_id));
+                    editor.apply();
+                    editor.commit();
+                    Toast.makeText(getApplicationContext(), getString(R.string.invalid_config_2), Toast.LENGTH_SHORT).show();
+                }else {
+                    DataBaseFacade.getInstance().setLocalUserID(userID);
+                }
+            });
+            return true;
+        }else {
+            return false;
+        }
     }
 
     void checkIfConfigExists(String userID, String configID){
-        Log.d(TAG, "checkIfConfigExists: configID " + configID);
-        Log.d(TAG, "checkIfConfigExists: userID " + userID);
-        ProgressDialog pd = new ProgressDialog(SetupWizardActivity.this);
-        pd.setMessage("Checking if config exists...");
+
+        ProgressDialog pd = new ProgressDialog(new ContextThemeWrapper(SetupWizardActivity.this, R.style.MyAlertDialogStyle));
+        pd.setMessage(getString(R.string.checking_config));
         pd.show();
 
-        DataBaseFacade.getInstance().checkIfConfigExists(getApplicationContext(), configID, result -> {
+        DataBaseFacade.getInstance().setConfigID(getApplicationContext(), configID, result -> {
             validConfig = result;
             pd.dismiss();
             if (validConfig){
-                Log.d(TAG, "logIn:");
-                Log.d(TAG, "logIn: userID   ->" + userID);
-                Log.d(TAG, "logIn: configID ->" + configID);
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString(getString(R.string.user_id), userID);
                 editor.putString(getString(R.string.config_id), configID);
                 editor.apply();
                 editor.commit();
-                Toast.makeText(getApplicationContext(), "The config ID is valid", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.config_is_valid), Toast.LENGTH_SHORT).show();
+
+                mStepNumber = determineSetupStepNumber();
+                updateSetupStepView();
             }else {
-                Toast.makeText(getApplicationContext(), "The config ID is not valid", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),getString(R.string.config_is_invalid), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -679,9 +698,14 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
 
             if(v == mActionLabel && mLogInAction != null){
                 if(mStepView.findViewById(R.id.user_id) != null && mStepView.findViewById(R.id.config_id ) != null ){
-                    mLogInAction.run(
-                            ((EditText) mStepView.findViewById(R.id.user_id)).getText().toString(),
-                            ((EditText) mStepView.findViewById(R.id.config_id)).getText().toString());
+                    if(((EditText) mStepView.findViewById(R.id.user_id)).getText().toString().isEmpty() ||
+                            ((EditText) mStepView.findViewById(R.id.config_id)).getText().toString().isEmpty() ){
+                        Toast.makeText(getApplicationContext(), "empty", Toast.LENGTH_SHORT).show();
+                    }else {
+                        mLogInAction.run(
+                                ((EditText) mStepView.findViewById(R.id.user_id)).getText().toString(),
+                                ((EditText) mStepView.findViewById(R.id.config_id)).getText().toString());
+                    }
                 }
                 return;
             }else if (v == mActionLabel && mAction != null) {

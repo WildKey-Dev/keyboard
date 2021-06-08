@@ -17,6 +17,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import pt.lasige.inputmethod.latin.R;
 import pt.lasige.inputmethod.logger.DataBaseFacade;
 import pt.lasige.inputmethod.logger.Logger;
@@ -26,7 +28,7 @@ import pt.lasige.inputmethod.logger.data.StudyConstants;
 import pt.lasige.inputmethod.metrics.MetricsController;
 import pt.lasige.inputmethod.study.scheduler.ScheduleController;
 
-public class TranscriptionActivity extends Activity {
+public class TranscriptionActivity extends AppCompatActivity {
     int index = 0;
     String currentTargetPhrase;
     String[] phrases;
@@ -41,8 +43,6 @@ public class TranscriptionActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getActionBar() != null)
-            getActionBar().hide();
         Intent i = getIntent();
         studyID = i.getStringExtra("study-id");
         questionID = i.getStringExtra("question-id");
@@ -59,6 +59,9 @@ public class TranscriptionActivity extends Activity {
             //not the best bue this way we ensure that the user doesn't do anything wrong
             dismissProgressDialog();
             setContentView(R.layout.start_screen);
+            if(getSupportActionBar() != null)
+                getSupportActionBar().setTitle(R.string.transcription_task);
+
             ((TextView) findViewById(R.id.tv_task)).setText(R.string.transcription_desc);
 
             //if it is a paused task we start on the last recorded index
@@ -201,6 +204,10 @@ public class TranscriptionActivity extends Activity {
         currentTargetPhrase = phrases[this.index];
         ((TextView) findViewById(R.id.tv_phrase)).setText(currentTargetPhrase);
         this.index++;
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setTitle(String.format(getString(R.string.phrase_x), this.index));
+        else
+            Toast.makeText(getApplicationContext(), "NULL", Toast.LENGTH_SHORT).show();
         findViewById(R.id.et_phrase).requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(findViewById(R.id.et_phrase), InputMethodManager.SHOW_IMPLICIT);

@@ -54,11 +54,11 @@
         android:directBootAware="true">
 
 
-        <activity android:name="pt.lasige.inputmethod.study.TranscriptionActivity"/>
+        <activity android:name="pt.lasige.inputmethod.study.TranscriptionActivity" android:theme="@style/Wildkey"/>
         <activity android:name="pt.lasige.inputmethod.study.CompositionActivity"/>
         <activity android:name="pt.lasige.inputmethod.study.AlternateFingerTappingActivity" />
         <activity android:name="pt.lasige.inputmethod.study.DemoActivity"/>
-        <activity android:name="pt.lasige.inputmethod.study.PromptLauncherActivity"/>
+        <activity android:name="pt.lasige.inputmethod.study.PromptLauncherActivity" android:theme="@style/Wildkey"/>
         <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireLauncherActivity" android:theme="@style/MyQuestionnaire"/>
         <activity android:name="pt.lasige.inputmethod.latin.settings.SettingsLauncherActivity" />
 

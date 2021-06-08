@@ -140,12 +140,13 @@ public class Config {
     }
 
     public boolean isValid(){
-        try {
-            return Calendar.getInstance().getTime().before(parseDate(getToDate()));
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
+        return true;
+//        try {
+//            return Calendar.getInstance().getTime().before(parseDate(getToDate()));
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            return false;
+//        }
     }
 
     private Date parseDate(String date){

@@ -49,9 +49,6 @@ public final class StudySettings extends SubScreenFragment {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         final SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener = (sharedPreferences, key) -> {
-            if(key.equals(Settings.PREF_USER_ID)){
-                DataBaseFacade.getInstance().setLocalUserID(sharedPreferences.getString(Settings.PREF_USER_ID, "null"));
-            }
             if(key.equals(Settings.PREF_LOG)){
                 LoggerController.getInstance().setLog(getContext(), sharedPreferences.getBoolean(Settings.PREF_LOG, true));
             }

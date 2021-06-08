@@ -1,12 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="MyAlertDialogStyle" parent="@android:style/Theme.DeviceDefault.Light.Dialog.Alert">
-        <item name="android:colorAccent">@color/study_accent_color</item>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="MyAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/study_accent_color</item>
+        <item name="colorPrimary">@color/study_accent_color</item>
     </style>
     <style name="MyQuestionnaire" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:progressBackgroundTint">#80BF1472</item>
-        <item name="android:progressTint">@color/study_accent_color</item>
-        <item name="android:colorControlActivated">@color/study_accent_color</item>
+        <item name="colorControlActivated">@color/study_accent_color</item>
+        <item name="colorPrimaryDark">#890E52</item>
         <item name="colorAccent">@color/study_accent_color</item>
+    </style>
+    <style name="Wildkey" parent="Theme.AppCompat.Light">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/study_accent_color</item>
+        <item name="colorPrimaryDark">#890E52</item>
+        <item name="colorAccent">@color/study_accent_color</item>
+        <item name="actionBarStyle">@style/Wildkey.Styled.ActionBar</item>
+    </style>
+    <style name="Wildkey.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/study_accent_color</item>
+        <item name="colorPrimaryDark">#890E52</item>
+        <item name="colorAccent">@color/study_accent_color</item>
+    </style>
+    <style name="Wildkey.Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/study_accent_color</item>
+        <item name="colorPrimaryDark">#890E52</item>
+        <item name="colorAccent">@color/study_accent_color</item>
+    </style>
+    <style name="Wildkey.Styled.ActionBar" parent="@style/Widget.AppCompat.Light.ActionBar">
+        <item name="titleTextStyle">@style/ActionBarTitleText</item>
+        <item name="subtitleTextStyle">@style/ActionBarSubTitleText</item>
+        <item name="background">@color/study_accent_color</item>
+    </style>
+    <style name="ActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">#FFF</item>
+    </style>
+
+    <style name="ActionBarSubTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle">
+        <item name="android:textColor">#FFF</item>
     </style>
 </resources>
