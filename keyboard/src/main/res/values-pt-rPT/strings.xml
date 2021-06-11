@@ -268,7 +268,7 @@
     <string name="reset_tasks_summary">Apaga a progressão feita durante a sessão</string>
     <string name="reset_all">Terminar sessão</string>
     <string name="reset_all_summary">Termina a sessão na aplicação</string>
-    <string name="user_config_deleted">Utilizador e configuração apagados com sucesso.</string>
+    <string name="user_config_deleted">Utilizador e configuração apagados com sucesso. Por favor feche a aplicação.</string>
     <string name="invalid_config_2">The config ID is no longer valid. Please close the app and provide another config ID</string>
     <string name="checking_config">A verificar o id de configuração…</string>
     <string name="config_is_valid">O ID é válido</string>

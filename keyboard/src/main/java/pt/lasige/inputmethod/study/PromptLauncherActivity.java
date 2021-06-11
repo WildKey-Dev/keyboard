@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.util.Log;
@@ -78,6 +79,8 @@ public class PromptLauncherActivity extends AppCompatActivity {
                         editor.apply();
                         editor.commit();
                         Toast.makeText(getApplicationContext(), getString(R.string.config_is_valid), Toast.LENGTH_SHORT).show();
+                        Runnable r = this::recreate;
+                        new Handler().postDelayed(r, 1000);
                     }else {
                         Toast.makeText(getApplicationContext(),getString(R.string.config_is_invalid), Toast.LENGTH_SHORT).show();
                     }

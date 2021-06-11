@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import pt.lasige.inputmethod.latin.R;
+import pt.lasige.inputmethod.latin.setup.SetupWizardActivity;
 import pt.lasige.inputmethod.logger.DataBaseFacade;
 import pt.lasige.inputmethod.study.DemoActivity;
 import pt.lasige.inputmethod.study.PromptLauncherActivity;
@@ -47,7 +48,7 @@ public class SettingsLauncherActivity extends Activity {
                         | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(SettingsActivity.EXTRA_ENTRY_KEY,
                         SettingsActivity.EXTRA_ENTRY_VALUE_APP_ICON);
-                startActivity(intent);
+                startActivityForResult(intent, 1904);
             }
         });
         //gone from the UI
@@ -74,5 +75,15 @@ public class SettingsLauncherActivity extends Activity {
         super.onResume();
 
         settingsLauncherActivityUI.refresh(ScheduleController.getInstance().getQueue());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode== 1904) {
+            final Intent intent = new Intent(getApplicationContext(), SetupWizardActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 }

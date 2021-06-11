@@ -120,7 +120,7 @@
         </activity>
 
         <activity android:name=".settings.SettingsActivity"
-            android:theme="@style/platformSettingsTheme"
+            android:theme="@style/Wildkey"
             android:label="@string/english_ime_settings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -641,7 +641,7 @@ Tip: You can download and remove dictionaries by going to &lt;b>Languages&#160;&
     <string name="reset_tasks_summary">Deletes any progress for the current session</string>
     <string name="reset_all">Finish session</string>
     <string name="reset_all_summary">Finishes the session on the app</string>
-    <string name="user_config_deleted">User and config deleted</string>
+    <string name="user_config_deleted">User and config deleted. Please close the app</string>
     <string name="invalid_config_2">The config ID is no longer valid. Please close the app and provide another config ID</string>
     <string name="checking_config">Checking if config exists…</string>
     <string name="config_is_valid">The config ID is valid</string>

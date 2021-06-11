@@ -105,7 +105,6 @@ public class ScheduleController {
         for (TimeFrame tf: timeFrames.values()){
             if (ignoreDates){
                 for (String s: tf.getTasks()){
-                    Log.d("QUEUE", "inside  " + tf.getTimeFrameID()+"_"+s);
                     if(queue.contains(tf.getTimeFrameID()+"_"+s))
                         result.add(tf.getTimeFrameID()+"_"+s);
                 }
@@ -132,8 +131,6 @@ public class ScheduleController {
             }
         }
 
-        Log.d("QUEUE", "GET QUEUE  " + queue.toString());
-        Log.d("QUEUE", "GET result " + result.toString());
         return result;
     }
 

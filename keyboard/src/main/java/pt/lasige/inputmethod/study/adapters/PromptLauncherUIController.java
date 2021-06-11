@@ -76,6 +76,7 @@ public class PromptLauncherUIController {
 
     public void refresh(Context context, ArrayList<String> data) {
         try {
+            Log.d("SIZE", "SIZE: "+ data.toString());
             this.data.clear();
             this.data.addAll(data);
             if(this.data.isEmpty()) {

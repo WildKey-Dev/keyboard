@@ -43,22 +43,23 @@ public final class StudySettingsFragmentSubMenu extends SubScreenFragment {
         final Resources res = getResources();
         final Context context = getActivity();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Inserir password");
-
-        View layout = LayoutInflater.from(context)
-                .inflate(R.layout.change_config_dialog, null, false);
-        builder.setView(layout);
-        EditText input = layout.findViewById(R.id.et_config_id);
-        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
-
         final Preference reset = findPreference("reset_tasks");
         reset.setOnPreferenceClickListener(preference -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Inserir password");
+
+            View layout = LayoutInflater.from(context)
+                    .inflate(R.layout.change_config_dialog, null, false);
+            builder.setView(layout);
+            EditText input = layout.findViewById(R.id.et_config_id);
+            builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
             builder.setPositiveButton(getString(R.string.setup_step0_action), (dialog, which) -> {
                 String password = input.getText().toString();
                 if(password.equals("masterdelete")){
-                    Log.d("DELETE", "ENTREI");
                     DataBaseFacade.getInstance().deleteConfig();
+                    Toast.makeText(context, "A apagar os dados", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(context, "Password incorreta", Toast.LENGTH_SHORT).show();
                 }
 
             });
@@ -66,29 +67,33 @@ public final class StudySettingsFragmentSubMenu extends SubScreenFragment {
             return false;
         });
 
-        
+
         final EditTextPreference resetNumber = (EditTextPreference) findPreference("reset_task_number");
         final Preference resetNumberBt = findPreference("reset_task_number_bt");
 
         resetNumber.setSummary(resetNumber.getText());
         resetNumber.setOnPreferenceChangeListener((preference, newValue) -> {
-            builder.setPositiveButton(getString(R.string.setup_step0_action), (dialog, which) -> {
-                String password = input.getText().toString();
-                if(password.equals("masterdelete")){
-                    resetNumber.setSummary(String.valueOf(newValue));
-                    resetNumberBt.setSummary(getString(R.string.delete_phrases_after_summary) + " " + String.valueOf(newValue));
-                }
-
-            });
-            builder.show();
+            resetNumber.setSummary(String.valueOf(newValue));
+            resetNumberBt.setSummary(getString(R.string.delete_phrases_after_summary) + " " + String.valueOf(newValue));
             return true;
         });
         resetNumberBt.setSummary(getString(R.string.delete_phrases_after_summary) + " " + resetNumber.getText());
         resetNumberBt.setOnPreferenceClickListener(preference -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Inserir password");
+
+            View layout = LayoutInflater.from(context)
+                    .inflate(R.layout.change_config_dialog, null, false);
+            builder.setView(layout);
+            EditText input = layout.findViewById(R.id.et_config_id);
+            builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
             builder.setPositiveButton(getString(R.string.setup_step0_action), (dialog, which) -> {
                 String password = input.getText().toString();
                 if(password.equals("masterdelete")){
                     DataBaseFacade.getInstance().deleteConfig(Integer.parseInt(resetNumber.getText()));
+                    Toast.makeText(context, "A apagar os dados", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(context, "Password incorreta", Toast.LENGTH_SHORT).show();
                 }
             });
             builder.show();

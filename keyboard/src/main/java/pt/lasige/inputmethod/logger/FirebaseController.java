@@ -42,11 +42,21 @@ public class FirebaseController {
         if (user != null){
             if(user.isAnonymous()){
                 this.database = FirebaseDatabase.getInstance("https://cns-study.europe-west1.firebasedatabase.app/");
-            }else {
-                this.database = FirebaseDatabase.getInstance();
             }
+//            else {
+//                this.database = FirebaseDatabase.getInstance();
+//            }
         }else {
-            this.database = FirebaseDatabase.getInstance();
+            anonymousLogin(task -> {
+                if (task.isSuccessful()) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d(TAG, "signInAnonymously:success");
+                    changeDatabase("https://cns-study.europe-west1.firebasedatabase.app/");
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w(TAG, "signInAnonymously:failure", task.getException());
+                }
+            });
         }
     }
 
@@ -172,13 +182,12 @@ public class FirebaseController {
     }
 
     public void setConfigID(Context context, String configID, ConfigCallback callback) {
-        this.configID = configID;
         getConfig(context, configID, callback);
     }
 
-    public void getConfig(Context context, String configID, ConfigCallback callback){
+    public void getConfig(Context context, String newConfigID, ConfigCallback callback){
         if(this.mAuth.getCurrentUser() != null){
-            database.getReference("/config/"+configID).addValueEventListener(new ValueEventListener() {
+            database.getReference("/config/"+newConfigID).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     // This method is called once with the initial value and again
@@ -196,6 +205,7 @@ public class FirebaseController {
                                 }
                             }
                             ScheduleController.getInstance().setConfig(c);
+                            configID = newConfigID;
                             callback.onResponse(true);
                         }else {
                             callback.onResponse(false);
@@ -406,10 +416,7 @@ public class FirebaseController {
 
     public void deleteConfig() {
 
-        Log.d("DELETE", "size " + ScheduleController.getInstance().getAllTasks().size());
-        Log.d("DELETE", ScheduleController.getInstance().getAllTasks().toString());
         for(Prompt prompt: ScheduleController.getInstance().getPrompts().values()){
-            Log.d("DELET", "/users/"+getUserID()+"/completedTasks/"+ScheduleController.getInstance().getConfig().getStudyId()+"/"+prompt.getTimeFrame().getTimeFrameID()+"_"+prompt.getPromptId());
             database.getReference("/users")
                     .child(getUserID())
                     .child("completedTasks")

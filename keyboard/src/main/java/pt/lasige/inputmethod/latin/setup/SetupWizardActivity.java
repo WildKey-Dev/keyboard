@@ -443,8 +443,7 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
     }
 
     void logIn(String userID, String configID) {
-
-        checkIfConfigExists(userID, configID);
+        checkIfConfigExists(userID.trim(), configID.trim());
 
     }
 
@@ -453,7 +452,6 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String userID = prefs.getString(getString(R.string.user_id), null);
         String configID = prefs.getString(getString(R.string.config_id), null);
-
         if(userID != null && configID != null){
             DataBaseFacade.getInstance().setConfigID(getApplicationContext(), configID, result -> {
                 if (!result) {
