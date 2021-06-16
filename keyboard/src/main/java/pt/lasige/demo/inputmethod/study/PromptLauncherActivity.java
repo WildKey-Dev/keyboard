@@ -30,6 +30,8 @@ public class PromptLauncherActivity extends Activity {
                 Intent intent = PromptIntentFactory.getIntentForPrompt(getApplicationContext(), ScheduleController.getInstance().getPrompt(controller.getData().get(0)), controller.getData().get(0));
                 startActivity(intent);
                 finish();
+            }else {
+                finish();
             }
         });
     }

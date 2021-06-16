@@ -1,21 +1,16 @@
 package pt.lasige.demo.inputmethod.study;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,6 +34,7 @@ import pt.lasige.demo.inputmethod.study.scheduler.notification.Notification;
 public class DemoActivity extends Activity {
 
     boolean DEMOMODE = true;
+    boolean COOLDOWN = false;
     HashMap<String, Prompt> prompts = new HashMap<>();
     ArrayList<String> spinnerTranscription =  new ArrayList<>();
     ArrayList<String> spinnerComposition =  new ArrayList<>();
@@ -89,6 +85,10 @@ public class DemoActivity extends Activity {
         });
 
         findViewById(R.id.bt_transcription_schedule).setOnClickListener(v -> {
+            Log.d("DEBUGUGUGU", "cooldown " + COOLDOWN);
+            if(COOLDOWN)
+                return;
+            startCooldown();
             TimeFrame tf = new TimeFrame();
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, 1);
@@ -136,6 +136,9 @@ public class DemoActivity extends Activity {
         });
 
         findViewById(R.id.bt_composition_schedule).setOnClickListener(v -> {
+            if(COOLDOWN)
+                return;
+            startCooldown();
             TimeFrame tf = new TimeFrame();
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, 1);
@@ -176,11 +179,14 @@ public class DemoActivity extends Activity {
             intent.putExtra("study-id", ScheduleController.getInstance().getConfig().getStudyId());
             intent.putExtra("question-id", "questionnaire-demo");
             String[] questions = new String[]{"questionnaire_one_choice", "questionnaire_multiple_choice", "questionnaire_select_scale", "questionnaire_slider_scale", "questionnaire_open", "questionnaire_hour"};
-            intent.putExtra("questions", p.getQuestions().toArray(questions));
+            intent.putExtra("questions", questions);
             startActivity(intent);
         });
 
         findViewById(R.id.bt_questionnaire_schedule).setOnClickListener(v -> {
+            if(COOLDOWN)
+                return;
+            startCooldown();
             TimeFrame tf = new TimeFrame();
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, 1);
@@ -225,6 +231,9 @@ public class DemoActivity extends Activity {
         });
 
         findViewById(R.id.bt_fingertapping_schedule).setOnClickListener(v -> {
+            if(COOLDOWN)
+                return;
+            startCooldown();
             TimeFrame tf = new TimeFrame();
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MINUTE, 1);
@@ -275,7 +284,11 @@ public class DemoActivity extends Activity {
             File f = new File(getFilesDir().getAbsolutePath(), "metrics.json");
             if(f.exists()){
                 boolean b = f.delete();
-                Toast.makeText(getApplicationContext(), "Internal file deleted: " + b, Toast.LENGTH_SHORT).show();
+                if(b){
+                    Toast.makeText(getApplicationContext(), "Internal file deleted", Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(getApplicationContext(), "Something went wrong deleting internal file", Toast.LENGTH_SHORT).show();
+                }
             }else {
                 Toast.makeText(getApplicationContext(), "Internal file doesn't exists", Toast.LENGTH_SHORT).show();
             }
@@ -335,4 +348,8 @@ public class DemoActivity extends Activity {
         }
     }
 
+    private void startCooldown(){
+        COOLDOWN = true;
+        new Handler().postDelayed(() -> COOLDOWN = false, 90 * 1000);
+    }
 }

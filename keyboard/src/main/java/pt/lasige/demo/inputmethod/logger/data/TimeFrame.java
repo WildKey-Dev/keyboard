@@ -4,7 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -97,7 +96,7 @@ public class TimeFrame {
         Calendar startDate = getStartDate();
         Calendar endDate = getEndDate();
 
-        if(Calendar.getInstance().getTime().before(startDate.getTime())){
+       if(Calendar.getInstance().getTime().before(startDate.getTime())){
             Intent intent = new Intent(context, AlarmReceiver.class);
             int requestCode = year + month + day + Integer.parseInt(start.replace(":", ""));
             PendingIntent pending;
@@ -111,6 +110,7 @@ public class TimeFrame {
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
             manager.setAlarmClock(new AlarmManager.AlarmClockInfo(startDate.getTimeInMillis(), pending), pending);
+
             ScheduleController.getInstance().addAlarm(pending);
 
             //schedule alarm to cancel notification if time frame expires

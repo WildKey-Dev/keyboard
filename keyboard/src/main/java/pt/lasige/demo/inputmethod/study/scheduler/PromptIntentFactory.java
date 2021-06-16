@@ -8,8 +8,8 @@ import pt.lasige.demo.inputmethod.latin.R;
 import pt.lasige.demo.inputmethod.logger.data.Prompt;
 import pt.lasige.demo.inputmethod.study.AlternateFingerTappingActivity;
 import pt.lasige.demo.inputmethod.study.CompositionActivity;
-import pt.lasige.demo.inputmethod.study.questionnaire.QuestionnaireLauncherActivity;
 import pt.lasige.demo.inputmethod.study.TranscriptionActivity;
+import pt.lasige.demo.inputmethod.study.questionnaire.QuestionnaireLauncherActivity;
 
 public class PromptIntentFactory {
 
