@@ -61,24 +61,23 @@ public class ScheduleController {
     public String getNextQuestionDate() {
 
         String start;
-        Date dStart, dNow = Calendar.getInstance().getTime();
+        Calendar cStart, cNow = Calendar.getInstance();
         long dif = Long.MAX_VALUE;
         String nextQuest = "";
         String nextDate = "";
 
         for (TimeFrame tf: timeFrames.values()){
-            start = tf.getStart();
-            dStart = getDate(Integer.parseInt(start.split(":")[0]),
-                    Integer.parseInt(start.split(":")[1]),
-                    tf.getDay(),
-                    tf.getMonth(),
-                    tf.getYear());
+            cStart = tf.getStartCalendar();
 
-            if(dNow.before(dStart)) {
-                if(dif > (dStart.getTime() - dNow.getTime())){
-                    dif = dStart.getTime() - dNow.getTime();
+            if(cNow.getTime().before(cStart.getTime())) {
+                if(dif > (cStart.getTimeInMillis() - cNow.getTimeInMillis())){
+                    dif = cStart.getTimeInMillis() - cNow.getTimeInMillis();
                     nextQuest = tf.getTimeFrameID() + "_" + tf.getTasks().get(0);
-                    nextDate = tf.getStart() + ", " + tf.getDay() + "/" + tf.getMonth() + "/" + tf.getYear();
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(tf.getStartCalendar().getTime());
+                    Log.d("TAG", "getNextQuestionDate: " +  c.getTime().toString());
+                    Log.d("TAG", "getNextQuestionDate: " +  c.get(Calendar.YEAR));
+                    nextDate = tf.getHours(tf.getStartCalendar()) + ", " + tf.getStartCalendar().get(Calendar.DAY_OF_MONTH) + "/" + (tf.getStartCalendar().get(Calendar.MONTH) + 1) + "/" + tf.getStartCalendar().get(Calendar.YEAR);
                 }
             }
         }
@@ -100,7 +99,7 @@ public class ScheduleController {
 
         ArrayList<String> result = new ArrayList<>();
         String start, end;
-        Date dStart, dEnd, dNow = Calendar.getInstance().getTime();
+        Calendar cStart, cEnd, cNow = Calendar.getInstance();
 
         for (TimeFrame tf: timeFrames.values()){
             if (ignoreDates){
@@ -109,20 +108,10 @@ public class ScheduleController {
                         result.add(tf.getTimeFrameID()+"_"+s);
                 }
             }else {
-                start = tf.getStart();
-                end = tf.getEnd();
-                dStart = getDate(Integer.parseInt(start.split(":")[0]),
-                        Integer.parseInt(start.split(":")[1]),
-                        tf.getDay(),
-                        tf.getMonth(),
-                        tf.getYear());
-                dEnd = getDate(Integer.parseInt(end.split(":")[0]),
-                        Integer.parseInt(end.split(":")[1]),
-                        tf.getDay(),
-                        tf.getMonth(),
-                        tf.getYear());
+                cStart = tf.getStartCalendar();
+                cEnd = tf.getEndCalendar();
 
-                if(dNow.after(dStart) && dNow.before(dEnd)) {
+                if(cNow.getTime().after(cStart.getTime()) && cNow.getTime().before(cEnd.getTime())) {
                     for (String s: tf.getTasks()){
                         if(queue.contains(tf.getTimeFrameID()+"_"+s))
                             result.add(tf.getTimeFrameID()+"_"+s);

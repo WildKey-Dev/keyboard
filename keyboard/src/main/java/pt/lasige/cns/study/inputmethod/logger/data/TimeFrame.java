@@ -1,10 +1,12 @@
 package pt.lasige.cns.study.inputmethod.logger.data;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -14,33 +16,30 @@ import pt.lasige.cns.study.inputmethod.study.scheduler.notification.AlarmReceive
 import pt.lasige.cns.study.inputmethod.study.scheduler.notification.Notification;
 
 public class TimeFrame {
-    String start;
-    String end;
+    String startDate;
+    String endDate;
     String timeFrameID;
     Notification notification;
-    int day;
-    int month;
-    int year;
 
     ArrayList<String> tasks;
 
     public TimeFrame() {
     }
 
-    public String getStart() {
-        return start;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setStart(String start) {
-        this.start = start;
+    public void setStartDate(String start) {
+        this.startDate = start;
     }
 
-    public String getEnd() {
-        return end;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setEnd(String end) {
-        this.end = end;
+    public void setEndDate(String end) {
+        this.endDate = end;
     }
 
     public ArrayList<String> getTasks() {
@@ -59,30 +58,6 @@ public class TimeFrame {
         this.timeFrameID = timeFrameID;
     }
 
-    public int getDay() {
-        return day;
-    }
-
-    public void setDay(int day) {
-        this.day = day;
-    }
-
-    public int getMonth() {
-        return month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
     public Notification getNotification() {
         return notification;
     }
@@ -91,20 +66,21 @@ public class TimeFrame {
         this.notification = notification;
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     public void setAlarm(Context context) {
 
-        Calendar startDate = getStartDate();
-        Calendar endDate = getEndDate();
+        Calendar startDate = getStartCalendar();
+        Calendar endDate = getEndCalendar();
 
         if(Calendar.getInstance().getTime().before(startDate.getTime())){
             Intent intent = new Intent(context, AlarmReceiver.class);
-            int requestCode = year + month + day + Integer.parseInt(start.replace(":", ""));
+            int requestCode = startDate.get(Calendar.YEAR) + startDate.get(Calendar.MONTH) + startDate.get(Calendar.DAY_OF_MONTH) + startDate.get(Calendar.HOUR_OF_DAY) + startDate.get(Calendar.MINUTE);
             PendingIntent pending;
             AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             intent.putExtra("type", "fixed_time_notification");
             intent.putExtra("requestCode", requestCode);
-            intent.putExtra("title", notification.getTitle() + " (" + start + " - " + end + ")");
-            intent.putExtra("message", notification.getMessage() + ". " + context.getString(R.string.you_have_until) + " " + end + " " + context.getString(R.string.to_finish));
+            intent.putExtra("title", notification.getTitle() + " (" + getHours(startDate) + " - " + getHours(endDate) + ")");
+            intent.putExtra("message", notification.getMessage() + ". " + context.getString(R.string.you_have_until) + " " + getHours(endDate) + " " + context.getString(R.string.to_finish));
             pending = PendingIntent.getBroadcast(context,
                     requestCode,
                     intent,
@@ -116,7 +92,7 @@ public class TimeFrame {
             Intent cancelIntent = new Intent(context, AlarmReceiver.class);
             cancelIntent.putExtra("type", "cancel_fixed_time_notification");
             cancelIntent.putExtra("requestCode", requestCode);
-            int requestCodeCancel = year + month + day + Integer.parseInt(end.replace(":", ""));
+            int requestCodeCancel = endDate.get(Calendar.YEAR) + endDate.get(Calendar.MONTH) + endDate.get(Calendar.DAY_OF_MONTH) + endDate.get(Calendar.HOUR_OF_DAY) + endDate.get(Calendar.MINUTE);
             pending = PendingIntent.getBroadcast(context,
                     requestCodeCancel,
                     cancelIntent,
@@ -127,28 +103,36 @@ public class TimeFrame {
         }
     }
 
-    private Calendar getDayCalendar(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.MONTH, month - 1);
-        calendar.set(Calendar.YEAR, year);
-        return calendar;
+    public String getHours(Calendar c){
+        return (c.get(Calendar.HOUR_OF_DAY) < 10 ? "0" + c.get(Calendar.HOUR_OF_DAY) : c.get(Calendar.HOUR_OF_DAY)) + ":" + (c.get(Calendar.MINUTE) < 10 ? "0" + c.get(Calendar.MINUTE) : c.get(Calendar.MINUTE));
     }
 
-    private Calendar getStartDate(){
-        Calendar calendar = getDayCalendar();
-        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(start.split(":")[0]));
-        calendar.set(Calendar.MINUTE, Integer.parseInt(start.split(":")[1]));
-        calendar.set(Calendar.SECOND, 0);
-        return calendar;
+    public Calendar getStartCalendar(){
+        Calendar s = parseDate(startDate);
+        if(s == null)
+            return Calendar.getInstance();
+        else
+            return s;
     }
 
-    private Calendar getEndDate(){
-        Calendar calendar = getDayCalendar();
-        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(end.split(":")[0]));
-        calendar.set(Calendar.MINUTE, Integer.parseInt(end.split(":")[1]));
-        calendar.set(Calendar.SECOND, 0);
-        return calendar;
+    public Calendar getEndCalendar(){
+        Calendar e = parseDate(endDate);
+        if(e == null)
+            return Calendar.getInstance();
+        else
+            return e;
+    }
+
+    private Calendar parseDate(String date){
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        try {
+            Calendar c = Calendar.getInstance();
+            c.setTime(format.parse(date));
+            return c;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 

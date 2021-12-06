@@ -9,8 +9,8 @@ import java.util.Date;
 public class Config {
     String studyId;
     String configId;
-    String fromDate;
-    String toDate;
+    String startDate;
+    String endDate;
     String fromTime;
     String toTime;
     String dayEndTime;
@@ -49,12 +49,12 @@ public class Config {
         this.dayStartTime = dayStartTime;
     }
 
-    public String getFromDate() {
-        return fromDate;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setFromDate(String fromDate) {
-        this.fromDate = fromDate;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 
     public String getStudyId() {
@@ -65,12 +65,12 @@ public class Config {
         this.studyId = studyId;
     }
 
-    public String getToDate() {
-        return toDate;
+    public String getEndDate() {
+        return endDate;
     }
 
-    public void setToDate(String toDate) {
-        this.toDate = toDate;
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public String getFromTime() {

@@ -1,5 +1,6 @@
 package pt.lasige.cns.study.inputmethod.study;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -88,6 +89,7 @@ public class DemoActivity extends Activity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("/prompts/");
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("DefaultLocale")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot data: dataSnapshot.getChildren()){
@@ -95,11 +97,22 @@ public class DemoActivity extends Activity {
                     if (p != null) {
 
                         TimeFrame tf = new TimeFrame();
-                        tf.setDay(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-                        tf.setMonth(Calendar.getInstance().get(Calendar.MONTH));
-                        tf.setYear(Calendar.getInstance().get(Calendar.YEAR));
-                        tf.setStart("1:00");
-                        tf.setEnd("23:00");
+                        Calendar now = Calendar.getInstance();
+                        now.set(Calendar.HOUR_OF_DAY, 1);
+                        tf.setStartDate(String.format("%d-%s-%d'T'%s:%s:00.000'Z'",
+                                now.get(Calendar.YEAR),
+                                now.get(Calendar.MONTH) < 10 ? "0" + now.get(Calendar.MONTH) : String.format("%d", now.get(Calendar.MONTH)),
+                                (now.get(Calendar.DAY_OF_MONTH) + 1),
+                                now.get(Calendar.HOUR_OF_DAY) < 10 ? "0" + now.get(Calendar.HOUR_OF_DAY) : String.format("%d", now.get(Calendar.HOUR_OF_DAY)),
+                                now.get(Calendar.MINUTE) < 10 ? "0" + now.get(Calendar.MINUTE) : String.format("%d", now.get(Calendar.MINUTE))));
+
+                        now.set(Calendar.HOUR_OF_DAY, 23);
+                        tf.setEndDate(String.format("%d-%s-%d'T'%s:%s:00.000'Z'",
+                        now.get(Calendar.YEAR),
+                                now.get(Calendar.MONTH) < 10 ? "0" + now.get(Calendar.MONTH) : String.format("%d", now.get(Calendar.MONTH)),
+                                (now.get(Calendar.DAY_OF_MONTH) + 1),
+                                now.get(Calendar.HOUR_OF_DAY) < 10 ? "0" + now.get(Calendar.HOUR_OF_DAY) : String.format("%d", now.get(Calendar.HOUR_OF_DAY)),
+                                now.get(Calendar.MINUTE) < 10 ? "0" + now.get(Calendar.MINUTE) : String.format("%d", now.get(Calendar.MINUTE))));
                         p.setTimeFrame(tf);
                         prompts.put(p.getPromptId(), p);
 
