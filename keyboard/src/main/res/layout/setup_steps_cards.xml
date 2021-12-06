@@ -42,7 +42,7 @@
             style="@style/setupStepBulletStyle"
             android:text="@string/setup_step3_bullet" />
     </LinearLayout>
-    <pt.lasige.inputmethod.latin.setup.SetupStepIndicatorView
+    <pt.lasige.cns.study.inputmethod.latin.setup.SetupStepIndicatorView
         android:id="@+id/setup_step_indicator"
         style="@style/setupStepIndicatorStyle" />
     <FrameLayout
