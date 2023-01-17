@@ -22,6 +22,7 @@ import pt.lasige.cns.study.inputmethod.metrics.data.FlightTime;
 import pt.lasige.cns.study.inputmethod.metrics.data.HoldTimeDeviations;
 import pt.lasige.cns.study.inputmethod.metrics.data.InsertionErrorRate;
 import pt.lasige.cns.study.inputmethod.metrics.data.OmissionErrorRate;
+import pt.lasige.cns.study.inputmethod.metrics.data.Pressure;
 import pt.lasige.cns.study.inputmethod.metrics.data.SelectedSuggestions;
 import pt.lasige.cns.study.inputmethod.metrics.data.SubstitutionsErrorRate;
 import pt.lasige.cns.study.inputmethod.metrics.data.TimeOutsidePhrase;
@@ -63,57 +64,84 @@ public class MetricsController {
         LoggerController.getInstance().resetLogger();
     }
 
-    private void calculateAll(final Logger log, final String targetPhrase, String questionID, String studyID, int phraseNumber, boolean removeSuggestionsFromInputStream){
+    private void writeErrors(ArrayList<Tuple> metricsErrors, Logger log, String studyID, String questionID, int phraseNumber){
+        //write the errors
+        try{
+            DataBaseFacade.getInstance().write("errors-session", log.getErrors(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            DataBaseFacade.getInstance().write("errors-metrics", metricsErrors, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("errors", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+    }
 
-        if(LoggerController.getInstance().isInputPassword() || !LoggerController.getInstance().isLog() || log.getTranscribe().isEmpty()) {
+    private void calculateAll(final Logger log, final String targetPhrase, String questionID, String studyID, int phraseNumber){
+
+        ArrayList<Tuple> metricsErrors = new ArrayList<>();
+
+        if(LoggerController.getInstance().isInputPassword() || !LoggerController.getInstance().isLog()){
+            writeErrors(metricsErrors, log, studyID, questionID, phraseNumber);
             return;
         }
 
+        // calculate transcribe and inputStream is time consuming!
+        String myInputBuffer = log.getInputBuffer(false);
+        String myTranscribe = "";
         TextEntryTrialController trial = null;
+        
+        if(!myInputBuffer.isEmpty()){
+            myTranscribe = log.getTranscribe(myInputBuffer);
+            if(!myTranscribe.isEmpty()) {
+                try {
+                    //fresh trial
+                    trial = configTrial(log, targetPhrase, false);
 
-        try {
-
-            //fresh trial
-            trial = configTrial(log, targetPhrase, removeSuggestionsFromInputStream);
-
-        }catch (Exception e){
-            DataBaseFacade.getInstance().write("discarded", "something went wrong with trial calculation", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
-            DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+                }catch (Exception e){
+                    log.addError("discarded", "something went wrong with trial calculation");
+                    trial = null;
+                    DataBaseFacade.getInstance().write("discarded", "something went wrong with trial calculation", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+                    DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+                }
+            }
         }
-
+        
         int eca, wc, autoC, ss, vi, wn, wsc, ac, cac, eac;
         double wpm, cpa, cpc, cpe, ae, ce, ee;
         float uer, cer, ter, oer, ier, ser, tcc;
         ArrayList<Tuple> toe, tmm;
         ArrayList<Long> htd, ft, tpw, top;
-        String myInputStream = log.getInputBuffer(false);
-        String myTranscribe = log.getTranscribe();
+        ArrayList<Float> tp;
+
         double time;
         try{
             time = (log.getFlightTimeBuffer().get(log.getFlightTimeBuffer().size()-1) -
                     log.getFlightTimeBuffer().get(0));
         }catch (Exception e){
 
-            DataBaseFacade.getInstance().write("discarded", "flight buffers are empty for ts calculation", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
-            DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+            log.addError("warning", "input was empty");
+//            DataBaseFacade.getInstance().write("discarded", "flight buffers are empty for ts calculation", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+//            DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
 
             //clean memory
             if(trial != null)
                 trial.stopTrial();
 
+            writeErrors(metricsErrors, log, studyID, questionID, phraseNumber);
             return;
         }
 
-
         try{
-            wpm = new WordsPerMinute().execute(log.getTranscribe(), time);
-            DataBaseFacade.getInstance().write("words-per-minute", wpm, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+            wpm = new WordsPerMinute().execute(myTranscribe, time);
+            if (wpm == -1)
+                metricsErrors.add(new Tuple("words-per-minute", "length was less than 5 chars"));
+            else
+                DataBaseFacade.getInstance().write("words-per-minute", wpm, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
         }catch (Exception e){
             DataBaseFacade.getInstance().write("words-per-minute", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
         }
         try{
             if(trial == null){
-                DataBaseFacade.getInstance().write("uncorrected-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                metricsErrors.add(new Tuple("uncorrected-error-rate", "trial object was null"));
+//                DataBaseFacade.getInstance().write("uncorrected-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }else {
                 uer = new UncorrectedErrorRate().execute(trial.getTrial());
                 DataBaseFacade.getInstance().write("uncorrected-error-rate", uer, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
@@ -123,7 +151,8 @@ public class MetricsController {
         }
         try{
             if(trial == null){
-                DataBaseFacade.getInstance().write("corrected-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                metricsErrors.add(new Tuple("corrected-error-rate", "trial object was null"));
+//                DataBaseFacade.getInstance().write("corrected-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }else {
                 cer = new CorrectedErrorRate().execute(trial.getTrial());
                 DataBaseFacade.getInstance().write("corrected-error-rate", cer, "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
@@ -133,7 +162,8 @@ public class MetricsController {
         }
         try{
             if(trial == null){
-                DataBaseFacade.getInstance().write("total-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                metricsErrors.add(new Tuple("total-error-rate", "trial object was null"));
+//                DataBaseFacade.getInstance().write("total-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }else {
                 ter = new TotalErrorRate().execute(trial.getTrial());
                 DataBaseFacade.getInstance().write("total-error-rate", ter, "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
@@ -143,7 +173,8 @@ public class MetricsController {
         }
         try{
             if(trial == null){
-                DataBaseFacade.getInstance().write("omission-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                metricsErrors.add(new Tuple("omission-error-rate", "trial object was null"));
+//                DataBaseFacade.getInstance().write("omission-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }else {
                 oer = new OmissionErrorRate().execute(trial.getTrial());
                 DataBaseFacade.getInstance().write("omission-error-rate", oer, "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
@@ -153,7 +184,8 @@ public class MetricsController {
         }
         try{
             if(trial == null){
-                DataBaseFacade.getInstance().write("insertions-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                metricsErrors.add(new Tuple("insertions-error-rate", "trial object was null"));
+//                DataBaseFacade.getInstance().write("insertions-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }else {
                 ier = new InsertionErrorRate().execute(trial.getTrial());
                 DataBaseFacade.getInstance().write("insertions-error-rate", ier, "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
@@ -163,7 +195,8 @@ public class MetricsController {
         }
         try{
             if(trial == null){
-                DataBaseFacade.getInstance().write("substitutions-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                metricsErrors.add(new Tuple("substitutions-error-rate", "trial object was null"));
+//                DataBaseFacade.getInstance().write("substitutions-error-rate", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }else {
                 ser = new SubstitutionsErrorRate().execute(trial.getTrial());
                 DataBaseFacade.getInstance().write("substitutions-error-rate", ser, "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
@@ -188,6 +221,12 @@ public class MetricsController {
             DataBaseFacade.getInstance().write("touch-major-and-minor", tmm, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
         }catch (Exception e){
             DataBaseFacade.getInstance().write("touch-major-and-minor", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+        try{
+            tp = new Pressure().execute(log);
+            DataBaseFacade.getInstance().write("touch-pressure", tp, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("touch-pressure", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
         }
         try{
             htd = new HoldTimeDeviations().execute(log);
@@ -245,7 +284,8 @@ public class MetricsController {
         }
         try{
             if(trial == null){
-                DataBaseFacade.getInstance().write("total-changed-characters", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                metricsErrors.add(new Tuple("total-changed-characters", "trial object was null"));
+//                DataBaseFacade.getInstance().write("total-changed-characters", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }else {
                 tcc = new TotalChangedCharacters().execute(trial.getTrial());
                 DataBaseFacade.getInstance().write("total-changed-characters", tcc, "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
@@ -279,8 +319,8 @@ public class MetricsController {
         }
 
         try {
-            if(myInputStream.split(" ").length != myTranscribe.split(" ").length) {
-                DataBaseFacade.getInstance().write("warning-input-transcribe-length-different", (myInputStream.split(" ").length - myTranscribe.split(" ").length), "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
+            if(myInputBuffer.split(" ").length != myTranscribe.split(" ").length) {
+                DataBaseFacade.getInstance().write("warning-input-transcribe-length-different", (myInputBuffer.split(" ").length - myTranscribe.split(" ").length), "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
             }
         }catch (Exception e){
             DataBaseFacade.getInstance().write("warning-input-transcribe-length-different", e.getMessage(), "/users/" + DataBaseFacade.getInstance().getUserID() + "/completedTasks/" + studyID + "/" + questionID + "/phrases/" + phraseNumber + "/");
@@ -348,7 +388,8 @@ public class MetricsController {
             }
             try {
                 if(trial == null)
-                    DataBaseFacade.getInstance().write("input-stream", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                    metricsErrors.add(new Tuple("input-stream", "trial object was null"));
+//                    DataBaseFacade.getInstance().write("input-stream", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
                 else
                     DataBaseFacade.getInstance().write("input-stream", trial.getTrial().getInputStream(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }catch (Exception e){
@@ -356,7 +397,8 @@ public class MetricsController {
             }
             try {
                 if(trial == null)
-                    DataBaseFacade.getInstance().write("target_phrase", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                    metricsErrors.add(new Tuple("target_phrase", "trial object was null"));
+//                    DataBaseFacade.getInstance().write("target_phrase", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
                 else
                     DataBaseFacade.getInstance().write("target_phrase", trial.getTrial().getRequiredSentence(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }catch (Exception e){
@@ -364,7 +406,8 @@ public class MetricsController {
             }
             try {
                 if(trial == null)
-                    DataBaseFacade.getInstance().write("transcribe", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+                    metricsErrors.add(new Tuple("transcribe", "trial object was null"));
+//                    DataBaseFacade.getInstance().write("transcribe", "trial object was null", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
                 else
                     DataBaseFacade.getInstance().write("transcribe", trial.getTrial().getTranscribedSentence(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
             }catch (Exception e){
@@ -388,6 +431,9 @@ public class MetricsController {
                 }
             }
         }
+
+        //write the errors
+        writeErrors(metricsErrors, log, studyID, questionID, phraseNumber);
 
         //clean memory
         if(trial != null)
@@ -428,12 +474,24 @@ public class MetricsController {
             if(log.wasEditTextEmpty() && log.getDiscardedChars() == 0){
                 runMetricCalculation(log, null, ts, "implicit_mode", 0);
             }else if(log.getDiscardedChars() > 0){
-                DataBaseFacade.getInstance().write("discarded", "suggestion accepted on cursor change", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+ts+"/phrases/"+0+"/");
-                DataBaseFacade.getInstance().write("discarded-characters", log.getDiscardedChars(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+ts+"/phrases/"+0+"/");
-                DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+                ArrayList<Tuple> additionalInfo = new ArrayList<>();
+                additionalInfo.add(new Tuple("discarded-characters", log.getDiscardedChars()));
+                log.addError("error", "suggestion accepted on cursor change", additionalInfo);
+//                DataBaseFacade.getInstance().write("discarded", "suggestion accepted on cursor change", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+ts+"/phrases/"+0+"/");
+//                DataBaseFacade.getInstance().write("discarded-characters", log.getDiscardedChars(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+ts+"/phrases/"+0+"/");
+//                DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+                runMetricCalculation(log, null, ts, "implicit_mode", 0);
             } else {
-                DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
-                DataBaseFacade.getInstance().write("discarded", "edit box was not empty", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+ts+"/phrases/"+0+"/");
+                if(log.getActions().size() > 0) {
+                    if(log.getCursorMoves() > 0)
+                        log.addError("error", "edit box was not empty");
+                    else
+                        log.addError("warning", "edit box was not empty");
+//                DataBaseFacade.getInstance().write("timestamp", System.currentTimeMillis(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+//                DataBaseFacade.getInstance().write("discarded", "edit box was not empty", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+ts+"/phrases/"+0+"/");
+                    runMetricCalculation(log, null, ts, "implicit_mode", 0);
+                }
+
             }
 
         }else if(mode == StudyConstants.TRANSCRIPTION_MODE){
@@ -442,14 +500,13 @@ public class MetricsController {
 
     public void runMetricCalculation(final Logger log, final String targetPhrase, String questionID, String studyID, int phraseNumber){
 
-
         if(targetPhrase != null){
             //calculate one time with the target phrase
             Thread thread = new Thread() {
                 @Override
                 public void run() {
-                    calculateAll(log, targetPhrase, questionID, studyID, phraseNumber, false);
-                    calculateAll(log, null, questionID+"-generated-target-phrase", studyID, phraseNumber, false);
+                    calculateAll(log, targetPhrase, questionID, studyID, phraseNumber);
+                    calculateAll(log, null, questionID+"-generated-target-phrase", studyID, phraseNumber);
                 }
             };
             executor.execute(thread);
@@ -457,7 +514,7 @@ public class MetricsController {
             Thread thread = new Thread() {
                 @Override
                 public void run() {
-                    calculateAll(log, null, questionID, studyID, phraseNumber, false);
+                    calculateAll(log, null, questionID, studyID, phraseNumber);
                 }
             };
             executor.execute(thread);

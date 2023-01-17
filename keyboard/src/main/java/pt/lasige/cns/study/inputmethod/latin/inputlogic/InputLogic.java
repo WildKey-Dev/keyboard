@@ -415,13 +415,16 @@ public final class InputLogic {
                     newSelStart, newSelEnd, false /* shouldFinishComposition */);
         }
 
-
         try{
             String composingText = mConnection.getmComposingText();
             if(composingText != null)
                 LoggerController.getInstance().getLogger().addCursorChange(new CursorChange(oldSelStart, oldSelEnd, newSelStart, newSelEnd, composingText.length(), System.currentTimeMillis()));
+            else {
+                LoggerController.getInstance().getLogger().addError("error", "cursor change happened and connection with the text box was null, impossible to calculate further metrics");
+            }
         }catch (Exception e){
             e.printStackTrace();
+            LoggerController.getInstance().getLogger().addError("error", "something went wrong with cursor change: " + e.getMessage());
             DataBaseFacade.getInstance().write("error", "something went wrong with cursor change: " + e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
         }
 

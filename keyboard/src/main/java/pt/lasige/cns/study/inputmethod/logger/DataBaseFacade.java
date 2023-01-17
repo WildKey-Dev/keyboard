@@ -72,7 +72,7 @@ public class DataBaseFacade {
         if (isDemo())
             return;
 
-        writeIfNotExists("init", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
+        writeIfNotExists("start", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
     }
 
     public void setEndTS(String studyID, String questionID, long currentTimeMillis) {
@@ -94,7 +94,7 @@ public class DataBaseFacade {
         if (isDemo())
             return;
 
-        writeIfNotExists("init", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/interruptions/"+index+"/");
+        writeIfNotExists("start", currentTimeMillis, "/users/"+ getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/interruptions/"+index+"/");
     }
 
     public void setInterruptionEndTS(String studyID, String questionID, int index, long currentTimeMillis) {
@@ -205,6 +205,7 @@ public class DataBaseFacade {
         if (isDemo())
             return;
 
+        write("type", "alternate_finger_tapping", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
         write("avg", avg, "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/");
     }
 

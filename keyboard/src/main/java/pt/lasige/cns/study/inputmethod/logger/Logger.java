@@ -4,6 +4,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 import pt.lasige.cns.study.inputmethod.keyboard.Key;
@@ -14,6 +16,7 @@ import pt.lasige.cns.study.inputmethod.logger.data.KeyEventData;
 import pt.lasige.cns.study.inputmethod.logger.data.MotionEventData;
 import pt.lasige.cns.study.inputmethod.logger.data.StudyConstants;
 import pt.lasige.cns.study.inputmethod.metrics.MetricsController;
+import pt.lasige.cns.study.inputmethod.metrics.textentry.datastructures.Error;
 import pt.lasige.cns.study.inputmethod.metrics.textentry.datastructures.Input;
 import pt.lasige.cns.study.inputmethod.metrics.textentry.datastructures.Tuple;
 
@@ -30,6 +33,7 @@ public class Logger {
     private final ArrayList<Long> timeOutsideCurrentPhrase = new ArrayList<>();
     private final ArrayList<Tuple> touchMajorMinor = new ArrayList<>();
     private final ArrayList<Tuple> touchOffset = new ArrayList<>();
+    private final ArrayList<Float> pressure = new ArrayList<>();
     private ArrayList<Tuple> motion = new ArrayList<>();
     private ArrayList<Tuple> keys = new ArrayList<>();
     private final ArrayList<Tuple> actions = new ArrayList<>();
@@ -37,7 +41,7 @@ public class Logger {
     private final ArrayList<SuggestedWords> suggestions = new ArrayList<>();
     private final HashMap<String, ArrayList<Tuple>> mSuggestedWordsHashMap = new HashMap<>();
     private long downTS, wordStartTS, wordFinishTS, outPhraseTS = -1;
-    private float tMajor = -1, tMinor = -1;
+    private float tMajor = -1, tMinor = -1, mPressure = -1;
     private boolean isEventRunning = false, lastInputWasDelete = false, lastInputWasSpace = false,
             lastInputWasSuggestion = false, lastSpaceWasProgrammatic = false, willAutoCorrect = false,
             autoCorrected = false, lastInputWasDeletable = false;
@@ -47,6 +51,7 @@ public class Logger {
             voiceInput = 0, cursorMoves = 0, compositionStartIndex = 0, discardedChars = 0;
     private final ArrayList<CursorChange> cursorChanges = new ArrayList<>();
     private SuggestedWords currentSuggestionList;
+    private final ArrayList<Error> errors = new ArrayList<>();
 
     public Logger() {}
 
@@ -107,6 +112,10 @@ public class Logger {
         return touchMajorMinor;
     }
 
+    public ArrayList<Float> getPressure() {
+        return pressure;
+    }
+
     public ArrayList<Tuple> getTouchOffset() {
         return touchOffset;
     }
@@ -130,7 +139,11 @@ public class Logger {
     }
 
     public String getTranscribe() {
-        return substituteDeletedChars(getInputBuffer(false));
+         return substituteDeletedChars(getInputBuffer(false));
+    }
+
+    public String getTranscribe(String inputBuffer) {
+        return substituteDeletedChars(inputBuffer);
     }
 
     public ArrayList<Long> getInputTimeStamps() {
@@ -190,7 +203,7 @@ public class Logger {
                     MetricsController.getInstance().mode == StudyConstants.COMPOSITION_MODE){
                 ignoreInput = false;
             }else {
-                ignoreInput = true;
+//                ignoreInput = true;
             }
         }else {
             // on transcription or on composition
@@ -385,8 +398,10 @@ public class Logger {
                 return newInputBuffer.toString().trim();
 
         }catch (Exception e){
-            e.printStackTrace();
-            DataBaseFacade.getInstance().write("error", "something went wrong with input buffer calculation", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
+            ArrayList<Tuple> additionalInfo = new ArrayList<>();
+            additionalInfo.add(new Tuple("exception", e.toString()));
+            errors.add(new Error("error", "something went wrong with input buffer calculation", additionalInfo));
+//            DataBaseFacade.getInstance().write("error", "something went wrong with input buffer calculation", "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/implicit_mode/"+String.valueOf(System.currentTimeMillis())+"/phrases/"+0+"/");
             return "";
         }
     }
@@ -654,7 +669,6 @@ public class Logger {
                     mSuggestedWordsHashMap.get(currentSuggestionList.mSuggestedWordInfoList.get(0).mWord).add(new Tuple(getTranscribe().length(), currentSuggestionList));
                 }
 
-
                 addToInputBuffer(" ");
 
                 timePerWord.add(wordFinishTS - wordStartTS);
@@ -684,7 +698,8 @@ public class Logger {
             if(key.getCode() >= 48 &&  key.getCode() <= 57){
                 incNumbers();
                 setLastInputWasDeletable(false);
-            }else if((key.getCode() == 45) || (key.getCode() >= 65 &&  key.getCode() <= 90) || (key.getCode() >= 97 &&  key.getCode() <= 122)){
+            }else if((key.getCode() == 45) || (key.getCode() >= 65 &&  key.getCode() <= 90) || (key.getCode() >= 97 &&  key.getCode() <= 122) ||
+                    key.getCode() >= 0 ){
                 addToInputBuffer(Constants.printableCode(key.getCode()));
 
                 wordTranscribe = wordTranscribe + Constants.printableCode(key.getCode());
@@ -1134,8 +1149,6 @@ public class Logger {
         flightTimeBuffer.add(eventTime);
         holdTimeBuffer.add(eventTime - downTS);
 
-        if(wasDelete)
-            holdTimeBuffer.add((long) -1);
     }
 
     public void addTouchMajorMinor(MotionEvent me){
@@ -1147,11 +1160,15 @@ public class Logger {
             tMinor = me.getTouchMinor();
         if(me.getTouchMajor() > tMajor)
             tMajor = me.getTouchMajor();
+        if(me.getPressure() > mPressure)
+            mPressure = me.getPressure();
 
         if(me.getAction() == MotionEvent.ACTION_UP){
             touchMajorMinor.add(new Tuple(tMajor, tMinor));
+            pressure.add(mPressure);
             tMajor = -1;
             tMinor = -1;
+            mPressure = -1;
         }
     }
 
@@ -1297,6 +1314,18 @@ public class Logger {
 
         wasCursorChanged = true;
         cursorChanges.add(cursorChange);
+    }
+
+    public void addError(String error, String message){
+        errors.add(new Error(error, message));
+    }
+
+    public void addError(String error, String message, ArrayList<Tuple> additionalInfo){
+        errors.add(new Error(error, message, additionalInfo));
+    }
+
+    public ArrayList<Error> getErrors(){
+       return errors;
     }
 
 }
