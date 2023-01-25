@@ -40,4 +40,13 @@
     <style name="ActionBarSubTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle">
         <item name="android:textColor">#FFF</item>
     </style>
+
+    <style name="MyCheckBox" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">#000</item>
+        <item name="colorControlActivated">@color/setup_text_action</item>
+        <item name="android:textColorPrimary">#000</item>
+    </style>
+
+    <style name="MyButton" parent="Theme.AppCompat.Light">
+    </style>
 </resources>

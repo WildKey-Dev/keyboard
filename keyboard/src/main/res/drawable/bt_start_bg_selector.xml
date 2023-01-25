@@ -3,14 +3,14 @@
     <item
         android:state_focused="true"
         android:state_pressed="true"
-        android:drawable="@drawable/bt_start_bg_clicked"
+        android:drawable="@drawable/bt_start_bg_clicked_privacy"
         android:color="@color/white"
         />
 
     <item
         android:state_focused="false"
         android:state_pressed="true"
-        android:drawable="@drawable/bt_start_bg_clicked"
+        android:drawable="@drawable/bt_start_bg_clicked_privacy"
         android:color="@color/white"
         />
 

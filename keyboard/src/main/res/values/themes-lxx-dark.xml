@@ -73,9 +73,9 @@
         <!-- A negative value to disable text shadow layer. -->
         <item name="languageOnSpacebarTextShadowRadius">-1.0</item>
     </style>
-    <!-- Though {@link pt.lasige.inputmethod.keyboard.emoji.EmojiPalettesView} doesn't extend
-         {@link pt.lasige.inputmethod.keyboard.KeyboardView}, some views inside it, for instance
-         delete button, need themed {@link pt.lasige.inputmethod.keyboard.KeyboardView}
+    <!-- Though {@link pt.lasige.ideafast.study.inputmethod.keyboard.emoji.EmojiPalettesView} doesn't extend
+         {@link pt.lasige.ideafast.study.inputmethod.keyboard.KeyboardView}, some views inside it, for instance
+         delete button, need themed {@link pt.lasige.ideafast.study.inputmethod.keyboard.KeyboardView}
          attributes. -->
     <style
         name="EmojiPalettesView.LXX_Dark"

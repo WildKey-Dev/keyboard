@@ -228,6 +228,7 @@
     <string name="transcription_desc">Nesta tarefa vai transcrever a frase que se encontra no ecrã para a caixa de texto.</string>
     <string name="questionnaire_desc">Nesta tarefa vai responder a uma pergunta.</string>
     <string name="index_finger_r">Nesta tarefa vai clicar alternadamente nos dois rectangulos primeiro com o indicador direito por 20 segundos, e depois com o esquerdo por 20 segundos.</string>
+    <string name="index_finger_r_saved">Indicador direito terminado.</string>
     <string name="index_finger_l">Agora com o indicador esquerdo.</string>
     <string name="close_window">Fechar janela</string>
     <string name="are_you_sure">Tem a certeza que deseja sair?</string>
@@ -266,13 +267,13 @@
     <string name="pending_tasks">%1$s tarefas pendentes</string>
     <string name="reset_current_task">Apagar sessão</string>
     <string name="reset_tasks_summary">Apaga a progressão feita durante a sessão</string>
-    <string name="reset_all">Terminar sessão</string>
-    <string name="reset_all_summary">Termina a sessão na aplicação</string>
-    <string name="user_config_deleted">Utilizador e configuração apagados com sucesso. Por favor feche a aplicação.</string>
+    <string name="reset_all">Terminar sessão </string>
+    <string name="reset_all_summary">Termina a sessão do utilizador %1$s na aplicação</string>
+    <string name="user_config_deleted">Sucesso. Por favor feche a aplicação.</string>
     <string name="invalid_config_2">The config ID is no longer valid. Please close the app and provide another config ID</string>
-    <string name="checking_config">A verificar o id de configuração…</string>
-    <string name="config_is_valid">O ID é válido</string>
-    <string name="config_is_invalid">O ID é inválido</string>
+    <string name="checking_user">A verificar o id…</string>
+    <string name="user_is_valid">Sucesso</string>
+    <string name="user_is_invalid">Inválido, por favor verifique que está a intruduzir é válido</string>
     <string name="delete_phrases_after_summary">Apagar frases depois:</string>
     <string name="delete_phrases_after_title">Apagar frases</string>
     <string name="phrase_number">Frase número</string>
@@ -283,4 +284,5 @@
     <string name="session_manager_sub_menu_summary">Contém opções para apagar a sessão</string>
     <string name="session_manager">Gestão da sessão</string>
     <string name="setup_step0_action">Validar</string>
+    <string name="participant_code">IDEA-FAST Data ID</string>
 </resources>

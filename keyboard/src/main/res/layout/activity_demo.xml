@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="pt.lasige.inputmethod.study.DemoActivity">
+    tools:context="pt.lasige.ideafast.study.study.DemoActivity">
 
     <Button
         android:id="@+id/bt_transcription"

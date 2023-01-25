@@ -42,25 +42,26 @@
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:ems="10"
-        android:hint="Código do participante"
-        android:inputType="textPersonName"
+        android:hint="@string/participant_code"
+        android:inputType="text"
         android:paddingStart="8dp"
         android:paddingRight="8dp"
+        android:fontFamily="sans-serif"
         android:theme="@style/Wildkey.NoActionBar" />
 
-    <EditText
-        android:id="@+id/config_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="@dimen/setup_step_vertical_padding"
-        android:ems="10"
-        android:hint="Código da sessão"
-        android:inputType="textPersonName"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:theme="@style/Wildkey.NoActionBar" />
+<!--    <EditText-->
+<!--        android:id="@+id/password"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="24dp"-->
+<!--        android:layout_marginEnd="24dp"-->
+<!--        android:ems="10"-->
+<!--        android:hint="@string/password"-->
+<!--        android:inputType="textPassword"-->
+<!--        android:paddingStart="8dp"-->
+<!--        android:paddingRight="8dp"-->
+<!--        android:fontFamily="sans-serif"-->
+<!--        android:theme="@style/Wildkey.NoActionBar" />-->
 
     <TextView
         android:id="@+id/setup_step_action_label"

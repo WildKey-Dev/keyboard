@@ -13,7 +13,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     coreApp="true"
-    package="pt.lasige.inputmethod.latin">
+    package="pt.lasige.ideafast.study.latin">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
@@ -24,6 +24,7 @@
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
@@ -33,52 +34,54 @@
          To use this, add the following line into calling application's AndroidManifest.xml
          <pre>
          {@code
-         <uses-permission android:name="pt.lasige.inputmethod.latin.HIDE_SOFT_INPUT"/>
+         <uses-permission android:name="pt.lasige.ideafast.study.inputmethod.latin.HIDE_SOFT_INPUT"/>
          }
          </pre>
          then call {@link android.content.Context#sendBroadcast(Intent)} as follows:
          <pre>
          {@code
-         sendBroadcast(new Intent("pt.lasige.inputmethod.latin.HIDE_SOFT_INPUT")
-                 .setPackage("pt.lasige.inputmethod.latin"));
+         sendBroadcast(new Intent("pt.lasige.ideafast.study.inputmethod.latin.HIDE_SOFT_INPUT")
+                 .setPackage("pt.lasige.ideafast.study.inputmethod.latin"));
          }
          </pre> -->
-    <permission android:name="pt.lasige.inputmethod.latin.HIDE_SOFT_INPUT"
+    <permission android:name="pt.lasige.ideafast.study.inputmethod.latin.HIDE_SOFT_INPUT"
         android:protectionLevel="signature" />
 
     <application android:label="@string/english_ime_name"
         android:icon="@drawable/ic_launcher_keyboard"
+        android:roundIcon="@drawable/ic_launcher_keyboard_round"
         android:supportsRtl="true"
         android:allowBackup="true"
         android:defaultToDeviceProtectedStorage="true"
         android:directBootAware="true">
 
 
-        <activity android:name="pt.lasige.inputmethod.study.TranscriptionActivity" android:theme="@style/Wildkey"/>
-        <activity android:name="pt.lasige.inputmethod.study.CompositionActivity"/>
-        <activity android:name="pt.lasige.inputmethod.study.AlternateFingerTappingActivity" />
-        <activity android:name="pt.lasige.inputmethod.study.DemoActivity"/>
-        <activity android:name="pt.lasige.inputmethod.study.PromptLauncherActivity" android:theme="@style/Wildkey"/>
-        <activity android:name="pt.lasige.inputmethod.study.questionnaire.QuestionnaireLauncherActivity" android:theme="@style/MyQuestionnaire"/>
-        <activity android:name="pt.lasige.inputmethod.latin.settings.SettingsLauncherActivity" />
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.study.TranscriptionActivity" android:theme="@style/Wildkey"/>
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.study.CompositionActivity"/>
+        <activity android:screenOrientation="landscape" android:name="pt.lasige.ideafast.study.inputmethod.study.AlternateFingerTappingActivity" />
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.study.DemoActivity"/>
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.study.PromptLauncherActivity" android:theme="@style/Wildkey"/>
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.study.questionnaire.QuestionnaireLauncherActivity" android:theme="@style/MyQuestionnaire"/>
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.latin.settings.SettingsLauncherActivity" />
 
         <receiver
-            android:name="pt.lasige.inputmethod.study.scheduler.notification.AlarmReceiver"
+            android:name="pt.lasige.ideafast.study.inputmethod.study.scheduler.notification.AlarmReceiver"
             android:enabled="true" />
 
         <!-- Services -->
-        <service android:name="LatinIME"
+        <service android:name="pt.lasige.ideafast.study.inputmethod.latin.LatinIME"
             android:label="@string/english_ime_name"
-            android:permission="android.permission.BIND_INPUT_METHOD">
+            android:permission="android.permission.BIND_INPUT_METHOD"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.view.InputMethod" />
             </intent-filter>
             <meta-data android:name="android.view.im" android:resource="@xml/method" />
         </service>
-
-        <service android:name=".spellcheck.AndroidSpellCheckerService"
+        <service android:name="pt.lasige.ideafast.study.inputmethod.latin.spellcheck.AndroidSpellCheckerService"
             android:label="@string/spell_checker_service_name"
-            android:permission="android.permission.BIND_TEXT_SERVICE">
+            android:permission="android.permission.BIND_TEXT_SERVICE"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.service.textservice.SpellCheckerService" />
             </intent-filter>
@@ -86,17 +89,18 @@
                 android:resource="@xml/spellchecker" />
         </service>
 
-        <service android:name="pt.lasige.inputmethod.dictionarypack.DictionaryService"
+        <service android:name="pt.lasige.ideafast.study.inputmethod.dictionarypack.DictionaryService"
             android:label="@string/dictionary_service_name">
         </service>
 
         <!-- Activities -->
-        <activity android:name=".setup.SetupActivity"
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.latin.setup.SetupActivity"
             android:theme="@style/platformActivityTheme"
             android:label="@string/english_ime_name"
             android:icon="@drawable/ic_launcher_keyboard"
             android:launchMode="singleTask"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -104,60 +108,65 @@
         </activity>
 
         <activity
-            android:name=".permissions.PermissionsActivity"
+            android:name="pt.lasige.ideafast.study.inputmethod.latin.permissions.PermissionsActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:exported="false"
             android:taskAffinity="" >
         </activity>
 
-        <activity android:name=".setup.SetupWizardActivity"
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.latin.setup.SetupWizardActivity"
             android:theme="@style/platformActivityTheme"
             android:label="@string/english_ime_name"
-            android:clearTaskOnLaunch="true">
+            android:clearTaskOnLaunch="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".settings.SettingsActivity"
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.latin.settings.SettingsActivity"
             android:theme="@style/Wildkey"
-            android:label="@string/english_ime_settings">
+            android:label="@string/english_ime_settings"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".spellcheck.SpellCheckerSettingsActivity"
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.latin.spellcheck.SpellCheckerSettingsActivity"
             android:theme="@style/platformSettingsTheme"
-            android:label="@string/android_spell_checker_settings">
+            android:label="@string/android_spell_checker_settings"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 
-        <activity android:name="pt.lasige.inputmethod.dictionarypack.DictionarySettingsActivity"
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.dictionarypack.DictionarySettingsActivity"
             android:theme="@style/platformSettingsTheme"
             android:label="@string/dictionary_settings_title"
-            android:uiOptions="splitActionBarWhenNarrow">
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
 
-        <activity android:name="pt.lasige.inputmethod.dictionarypack.DownloadOverMeteredDialog"
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.dictionarypack.DownloadOverMeteredDialog"
             android:theme="@style/platformActivityTheme"
-            android:label="@string/dictionary_install_over_metered_network_prompt">
+            android:label="@string/dictionary_install_over_metered_network_prompt"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
 
         <!-- Unexported activity used for tests. -->
-        <activity android:name=".settings.TestFragmentActivity"
+        <activity android:name="pt.lasige.ideafast.study.inputmethod.latin.settings.TestFragmentActivity"
             android:exported="false" />
 
         <!-- Broadcast receivers -->
-        <receiver android:name="SystemBroadcastReceiver">
+        <receiver android:name="pt.lasige.ideafast.study.inputmethod.latin.SystemBroadcastReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -166,30 +175,30 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="DictionaryPackInstallBroadcastReceiver" android:exported="false">
+        <receiver android:name="pt.lasige.ideafast.study.inputmethod.latin.DictionaryPackInstallBroadcastReceiver" android:exported="false">
             <intent-filter>
-                <action android:name="pt.lasige.inputmethod.dictionarypack.aosp.UNKNOWN_CLIENT" />
+                <action android:name="pt.lasige.ideafast.study.dictionarypack.aosp.UNKNOWN_CLIENT" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="pt.lasige.inputmethod.dictionarypack.EventHandler">
+        <receiver android:name="pt.lasige.ideafast.study.inputmethod.dictionarypack.EventHandler" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
                 <action android:name="android.intent.action.DATE_CHANGED" />
-                <action android:name="pt.lasige.inputmethod.dictionarypack.aosp.UPDATE_NOW" />
-                <action android:name="pt.lasige.inputmethod.dictionarypack.aosp.INIT_AND_UPDATE_NOW" />
+                <action android:name="pt.lasige.ideafast.study.dictionarypack.aosp.UPDATE_NOW" />
+                <action android:name="pt.lasige.ideafast.study.dictionarypack.aosp.INIT_AND_UPDATE_NOW" />
             </intent-filter>
         </receiver>
 
         <!-- Broadcast receiver for AccountManager#LOGIN_ACCOUNTS_CHANGED_ACTION. -->
-        <receiver android:name=".accounts.AccountsChangedReceiver">
+        <receiver android:name="pt.lasige.ideafast.study.inputmethod.latin.accounts.AccountsChangedReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.accounts.LOGIN_ACCOUNTS_CHANGED" />
             </intent-filter>
         </receiver>
 
         <!-- Content providers -->
-        <provider android:name="pt.lasige.inputmethod.dictionarypack.DictionaryProvider"
+        <provider android:name="pt.lasige.ideafast.study.inputmethod.dictionarypack.DictionaryProvider"
             android:grantUriPermissions="true"
             android:exported="false"
             android:authorities="@string/authority"
@@ -202,7 +211,7 @@
             <meta-data android:name="com.google.firebase.components:com.google.firebase.database.DatabaseRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
         </service>
         <service
-            android:name="pt.lasige.inputmethod.logger.MyFirebaseMessagingService"
+            android:name="pt.lasige.ideafast.study.inputmethod.logger.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
