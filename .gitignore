@@ -9,3 +9,5 @@ java/google-services.json
 google-services.json
 *.hprof
 /java/res/values/values.xml
+/keyboard/release/keyboard-release.aab
+/keyboard/release/output-metadata.json
