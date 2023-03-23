@@ -490,6 +490,8 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
                     }
                 });
         } else {
+            pd.dismiss();
+            Toast.makeText(getApplicationContext(),getString(R.string.user_is_already_logged_in), Toast.LENGTH_SHORT).show();
             Log.d(TAG, "checkUID: " + currentUser.getEmail());
         }
     }

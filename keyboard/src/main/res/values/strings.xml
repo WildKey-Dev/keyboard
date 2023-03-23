@@ -665,4 +665,5 @@ Tip: You can download and remove dictionaries by going to &lt;b>Languages&#160;&
     <string name="schedule_start">schedule_start</string>
     <string name="schedule_activated">schedule_activated</string>
     <string name="password">Password</string>
+    <string name="user_is_already_logged_in">User is already logged in</string>
 </resources>
