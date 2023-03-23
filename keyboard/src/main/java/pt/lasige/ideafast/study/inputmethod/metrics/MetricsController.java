@@ -1,5 +1,6 @@
 package pt.lasige.ideafast.study.inputmethod.metrics;
 
+import android.content.res.Configuration;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -337,6 +338,13 @@ public class MetricsController {
         }
 
         try{
+            // screen orientation
+            DataBaseFacade.getInstance().write("orientation", log.getOrientation(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }catch (Exception e){
+            DataBaseFacade.getInstance().write("orientation", e.getMessage(), "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/");
+        }
+
+        try{
             //Language
             DataBaseFacade.getInstance().write(
                     "country",
@@ -362,6 +370,7 @@ public class MetricsController {
                     "tag",
                     String.format("%s", RichInputMethodManager.getInstance().getCurrentSubtypeLocale().toLanguageTag()),
                     "/users/"+ DataBaseFacade.getInstance().getUserID()+"/completedTasks/"+studyID+"/"+questionID+"/phrases/"+phraseNumber+"/language");
+
         }catch (Exception e){
             DataBaseFacade.getInstance().write(
                     "language",

@@ -1074,6 +1074,15 @@ public class LatinIME extends InputMethodService implements KeyboardActionListen
         super.onWindowShown();
         setNavigationBarVisibility(isInputViewShown());
         try{
+            if (getApplicationContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                LoggerController.getInstance().setOrientation("portrait");
+            } else {
+                LoggerController.getInstance().setOrientation("landscape");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        try{
             String uid = DataBaseFacade.getInstance().getUserID();
             if (uid != null && !uid.equals("no_uid")){
                 DataBaseFacade.getInstance().forceWrite("wildkey-last-seen", Calendar.getInstance().getTime().toString(), "/users/"+uid+"/");

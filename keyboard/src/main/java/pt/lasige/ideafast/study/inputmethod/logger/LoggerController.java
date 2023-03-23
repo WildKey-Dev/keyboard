@@ -52,6 +52,10 @@ public class LoggerController {
         isInputPassword = inputPassword;
     }
 
+    public void setOrientation(String orientation){
+        logger.setOrientation(orientation);
+    }
+
     public boolean shouldILog(){
         if(MetricsController.getInstance().mode == StudyConstants.IMPLICIT_MODE)
             if(privateMode)// the user turned of the log, this remains until the keyboard is closed

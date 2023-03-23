@@ -52,11 +52,23 @@ public class Logger {
     private SuggestedWords currentSuggestionList;
     private final ArrayList<Error> errors = new ArrayList<>();
 
+    private String orientation;
+
     public Logger() {}
+
+
 
     /**
      * Getters and setters
      */
+
+    public String getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(String orientation) {
+        this.orientation = orientation;
+    }
 
     public void setAutoCorrected(boolean autoCorrected) {
         this.autoCorrected = autoCorrected;
