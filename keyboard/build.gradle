@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 69
-        versionName "1.5.4-IDEAFAST"
+        versionCode 70
+        versionName "1.5.5-IDEAFAST"
         signingConfig signingConfigs.debug
     }
 
