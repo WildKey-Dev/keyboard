@@ -19,6 +19,7 @@ package pt.lasige.ideafast.study.inputmethod.dictionarypack;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 public final class EventHandler extends BroadcastReceiver {
     /**
@@ -41,6 +42,15 @@ public final class EventHandler extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
         intent.setClass(context, DictionaryService.class);
-        context.startService(intent);
+//        context.startService(intent);
+        try{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent);
+            } else {
+                context.startService(intent);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
