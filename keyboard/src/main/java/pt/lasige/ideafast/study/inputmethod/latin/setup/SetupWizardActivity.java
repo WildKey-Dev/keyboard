@@ -56,6 +56,7 @@ import com.google.firebase.auth.FirebaseUser;
 import pt.lasige.ideafast.study.inputmethod.compat.TextViewCompatUtils;
 import pt.lasige.ideafast.study.inputmethod.compat.ViewCompatUtils;
 import pt.lasige.ideafast.study.inputmethod.logger.Implicit;
+import pt.lasige.ideafast.study.inputmethod.logger.data.Device;
 import pt.lasige.ideafast.study.latin.R;
 import pt.lasige.ideafast.study.inputmethod.latin.settings.SettingsActivity;
 import pt.lasige.ideafast.study.inputmethod.latin.settings.SettingsLauncherActivity;
@@ -65,6 +66,7 @@ import pt.lasige.ideafast.study.inputmethod.logger.DataBaseFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -474,6 +476,9 @@ public final class SetupWizardActivity extends Activity implements View.OnClickL
 
                         Implicit.getInstance().setImplicitListener(getApplicationContext());
 //                Explicit.getInstance().setListener(); no need to this one for now
+
+                        Device device = new Device("wildkey", Build.BRAND, Build.DEVICE, Build.MODEL, Build.VERSION.RELEASE, Build.VERSION.SDK_INT, Calendar.getInstance().getTime().toString());
+                        DataBaseFacade.getInstance().forcePush(device, "/users/"+userID+"/device_list/");
 
                         DataBaseFacade.getInstance().forceWrite("brand", Build.BRAND, "/users/"+userID+"/device/");
                         DataBaseFacade.getInstance().forceWrite("device", Build.DEVICE, "/users/"+userID+"/device/");

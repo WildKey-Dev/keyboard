@@ -512,6 +512,17 @@ public class FirebaseController {
                 .setValue(false);
     }
 
+    public void pushWithoutLastSync(Object value, String path) {
+        try{
+            DatabaseReference myRef = database.getReference(path);
+            myRef.push().setValue(value);
+        }catch (Exception e){
+            e.printStackTrace();
+            DatabaseReference myRef = database.getReference(path);
+            myRef.push().setValue("invalid value");
+        }
+    }
+
     public interface ConfigCallback{
         void onResponse(boolean result);
     }

@@ -61,6 +61,10 @@ public class DataBaseFacade {
         fb.writeWithoutLastSync(key, value, path);
     }
 
+    public void forcePush(Object value, String path) {
+         fb.pushWithoutLastSync(value, path);
+    }
+
     public void writeIfNotExists(String key, Object value, String path){
         if (!LoggerController.getInstance().shouldILog() || isDemo())
             return;
